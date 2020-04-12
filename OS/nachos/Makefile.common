@@ -1,0 +1,263 @@
+# This is part of a GNU Makefile, included by the Makefiles in
+# each of the subdirectories.  
+#
+# This file includes all of the baseline code provided by Nachos.
+# Whenever you add a .h or .cc file, put it in the appropriate 
+# _H,_C, or _O list.
+#
+# The dependency graph between assignments is:
+#   1. THREADS before everything else
+#   2. USERPROG must come before VM
+#   3. USERPROG can come before or after FILESYS, but if USERPROG comes 
+#	before (as in this distribution), then it must define FILESYS_STUB
+#
+#   Other than that, you have complete flexibility.
+#
+# Also whenever you change the include structure of your program, you should 
+# do a gmake depend in the subdirectory -- this will modify the Makefile
+# to keep track of the new dependency.
+
+# You might want to play with the CFLAGS, but if you use -O it may
+# break the thread system.  You might want to use -fno-inline if
+# you need to call some inline functions from the debugger.
+
+# Copyright (c) 1992 The Regents of the University of California.
+# All rights reserved.  See copyright.h for copyright notice and limitation 
+# of liability and disclaimer of warranty provisions.
+
+# $Id: Makefile.common,v 3.5 2001/11/11 03:53:00 eae8264 Exp $
+
+# $Log: Makefile.common,v $
+# Revision 3.5  2001/11/11 03:53:00  eae8264
+# Updated for new classes.
+#
+# Revision 3.4  2001/11/09 17:29:06  eae8264
+# Removed the original NachOS basic filesystem
+# classes that we're not using.
+#
+# Revision 3.3  2001/11/08 22:12:30  eae8264
+# Node Cache mostly implemented and added.
+#
+# Revision 3.2  2001/11/08 18:42:13  trc2876
+# added mtree class and some stubs to filesystem
+# compiles
+# not tested
+# still needs some work (search for todo's)
+#
+# Revision 3.1  2001/11/05 23:50:44  trc2876
+# added mtree files
+# class MTreeNode
+# class MTreeRawNode
+# class MTreeMetaNode
+# class MTreeDataNode
+#
+# These are not complete or tested but they compile cleanly
+#
+# Revision 3.0  2001/11/04 19:45:24  trc2876
+# force revisions to 3.0
+#
+# Revision 2.9  2001/11/02 20:26:53  eae8264
+# Removed VMStats
+#
+# Revision 2.8  2001/10/30 01:36:44  eae8264
+# Added new VMStats class.
+#
+# Revision 2.7  2001/10/28 23:35:50  trc2876
+# after merge
+#
+# Revision 2.6.2.1  2001/10/28 22:33:46  trc2876
+# added BinTree class
+#
+# Revision 2.6  2001/10/23 20:40:19  etf2954
+# Added the object file to the makefile
+#
+# Revision 2.5  2001/10/23 20:35:36  etf2954
+# added dklist.h and dklist.cc
+#
+# Revision 2.4  2001/10/20 18:47:24  etf2954
+# Added correct vm stuff, yet again
+#
+# Revision 2.3  2001/10/20 18:41:51  etf2954
+# corrected vm makefilees
+#
+# Revision 2.2  2001/10/20 18:26:29  etf2954
+# Added vm stuff
+#
+# Revision 2.1  2001/10/19 22:02:34  p544-01b
+# Added SwapFile and KSwap
+#
+# Revision 2.0  2001/10/11 02:51:07  trc2876
+# changing revision numbers to the 2.0 tree
+#
+# Revision 1.3  2001/10/04 00:31:50  trc2876
+# renamed SynchConsole to SConsole
+#
+# Revision 1.2  2001/10/04 00:04:29  trc2876
+# Added SynchConsole
+#
+# Revision 1.1  2001/09/23 20:27:07  trc2876
+# Initial revision
+#
+
+CFLAGS = -g -Wall -Wshadow -fwritable-strings $(INCPATH) $(DEFINES) $(HOST) -DCHANGED
+LDFLAGS =
+
+# These definitions may change as the software is updated.
+# Some of them are also system dependent
+CPP=/lib/cpp
+CC = gcc
+LD = gcc
+AS = as
+
+PROGRAM = nachos
+
+THREAD_H =../threads/copyright.h\
+	../threads/alarms.h\
+	../threads/list.h\
+	../threads/dklist.h\
+	../threads/scheduler.h\
+	../threads/synch.h \
+	../threads/synchlist.h\
+	../threads/system.h\
+	../threads/thread.h\
+	../threads/utility.h\
+	../threads/threadtest.h\
+	../machine/interrupt.h\
+	../machine/sysdep.h\
+	../machine/stats.h\
+	../machine/timer.h
+
+THREAD_C =../threads/main.cc\
+	../threads/alarms.cc\
+	../threads/list.cc\
+	../threads/dklist.cc\
+	../threads/scheduler.cc\
+	../threads/synch.cc \
+	../threads/synchlist.cc\
+	../threads/system.cc\
+	../threads/thread.cc\
+	../threads/utility.cc\
+	../threads/threadtest.cc\
+	../machine/interrupt.cc\
+	../machine/sysdep.cc\
+	../machine/stats.cc\
+	../machine/timer.cc
+
+THREAD_S = ../threads/switch.s
+
+THREAD_O =main.o alarms.o list.o scheduler.o synch.o synchlist.o system.o \
+	thread.o utility.o threadtest.o interrupt.o stats.o sysdep.o timer.o \
+	dklist.o
+
+USERPROG_H = ../userprog/addrspace.h\
+	../userprog/bitmap.h\
+	../userprog/Process.h\
+	../userprog/ProcessInfo.h\
+	../userprog/ProcMan.h\
+	../userprog/SConsole.h\
+	../filesys/filesys.h\
+	../filesys/openfile.h\
+	../machine/console.h\
+	../machine/machine.h\
+	../machine/mipssim.h\
+	../machine/translate.h
+
+USERPROG_C = ../userprog/addrspace.cc\
+	../userprog/bitmap.cc\
+	../userprog/Process.cc\
+	../userprog/ProcMan.cc\
+	../userprog/exception.cc\
+	../userprog/progtest.cc\
+	../userprog/SConsole.cc\
+	../machine/console.cc\
+	../machine/machine.cc\
+	../machine/mipssim.cc\
+	../machine/translate.cc
+
+USERPROG_O = addrspace.o bitmap.o exception.o progtest.o console.o machine.o \
+	mipssim.o translate.o Process.o ProcMan.o SConsole.o 
+
+VM_H =  ../vm/KSwap.h \
+	../vm/SwapFile.h \
+	../vm/bintree.h \
+	../userprog/addrspace.h\
+	../userprog/bitmap.h\
+	../userprog/Process.h\
+	../userprog/ProcessInfo.h\
+	../userprog/ProcMan.h\
+	../userprog/SConsole.h\
+	../filesys/filesys.h\
+	../filesys/openfile.h\
+	../machine/console.h\
+	../machine/machine.h\
+	../machine/mipssim.h\
+	../machine/translate.h
+   
+VM_C =  ../vm/KSwap.cc \
+	../vm/SwapFile.cc \
+	../vm/bintree.cc \
+	../userprog/addrspace.cc\
+	../userprog/bitmap.cc\
+	../userprog/Process.cc\
+	../userprog/ProcMan.cc\
+	../userprog/exception.cc\
+	../userprog/progtest.cc\
+	../userprog/SConsole.cc\
+	../machine/console.cc\
+	../machine/machine.cc\
+	../machine/mipssim.cc\
+	../machine/translate.cc
+
+VM_O = addrspace.o bitmap.o exception.o progtest.o console.o machine.o \
+	mipssim.o translate.o Process.o ProcMan.o SConsole.o KSwap.o \
+	SwapFile.o bintree.o
+FILESYS_H = ../filesys/filesys.h \
+	../filesys/openfile.h\
+	../filesys/synchdisk.h\
+	../machine/disk.h \
+	../filesys/mtree.h \
+	../filesys/etree.h \
+	../filesys/Cache.h \
+	../filesys/DataCache.h \
+	../filesys/NodeCache.h
+FILESYS_C = ../filesys/filesys.cc\
+	../filesys/fstest.cc\
+	../filesys/openfile.cc\
+	../filesys/synchdisk.cc\
+	../machine/disk.cc \
+	../filesys/mtree.cc \
+	../filesys/etree.cc \
+	../filesys/Cache.cc \
+	../filesys/DataCache.cc \
+	../filesys/NodeCache.cc
+FILESYS_O = filesys.o fstest.o openfile.o synchdisk.o\
+	disk.o mtree.o etree.o Cache.o DataCache.o NodeCache.o 
+
+S_OFILES = switch.o
+
+OFILES = $(C_OFILES) $(S_OFILES)
+
+$(PROGRAM): $(OFILES)
+	$(LD) $(OFILES) $(LDFLAGS) -o $(PROGRAM)
+
+$(C_OFILES): %.o:
+	$(CC) $(CFLAGS) -c $<
+
+switch.o: ../threads/switch.s
+	$(CPP) $(CPP_AS_FLAGS) -P $(INCPATH) $(HOST) ../threads/switch.s > swtch.s
+	$(AS) -o switch.o swtch.s
+	rm swtch.s
+
+depend: $(CFILES) $(HFILES)
+	$(CC) $(INCPATH) $(DEFINES) $(HOST) -DCHANGED -M $(CFILES) > makedep
+	echo '/^# DO NOT DELETE THIS LINE/+2,$$d' >eddep
+	echo '$$r makedep' >>eddep
+	echo 'w' >>eddep
+	ed - Makefile < eddep
+	rm eddep makedep 
+	echo '# DEPENDENCIES MUST END AT END OF FILE' >> Makefile
+	echo '# IF YOU PUT STUFF HERE IT WILL GO AWAY' >> Makefile
+	echo '# see make depend above' >> Makefile
+
+
+

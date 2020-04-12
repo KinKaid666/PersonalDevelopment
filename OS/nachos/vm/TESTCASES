@@ -1,0 +1,261 @@
+TESTCASES: p544-01b
+===================
+
+NOTES:
+------
+** Please run nachos from within the nachos/test directory.  Before you run
+	this please do a 'make all' in that directory, and this will make
+	our swapfile.
+
+** The first few examples were done without all the statistical analysis working
+	please look at the bottom to see another run done with statistics
+	up and working.
+
+++++++++++++++++++++
+++++  * KEY *	++++
+++++++++++++++++++++
+
+--------
+one    |	- one is the current section of the testcase your are in
+--------
+
+COMMENT		- comments
+
+kssh>		- our shell prompt
+
+
+++++++++++++++++++++
+++++  */KEY *	++++
+++++++++++++++++++++
+
+
+
+-----------------
+USING THE TLB	|
+-----------------
+
+kssh> echo 1
+1 
+
+VM Statistics for echo
+======================
+Cold Misses:            7
+Capacity Misses:        0
+Conflict Misses:        0
+Total Misses:           7
+
+COMMENT
+	This shows a running program, actually 2 (including the shell), this
+	shows that our programs still can run, and exit correctly using our
+	new paradigm.  That is, using a TLB and not a page table.  Also,
+	because we copy a processes memory to the disk first, it shows the use
+	of our swapping.
+
+-----------------
+New arguments   |
+-----------------
+kssh> echo JimVallinoIsOurTeacher for Operating Systems 2
+JimVallinoIsOurTeacher for Operating Systems 2 
+
+VM Statistics for echo
+======================
+Cold Misses:            8
+Capacity Misses:        0
+Conflict Misses:        0
+Total Misses:           8
+
+COMMENT
+	Our arguments are kept at a large virtual memory address (0x30000000),
+	so we no longer have the restriction of 4 arguments at length 16 each.
+	By changing the file argdefs.h, located in the userprog directory, a 
+	user can recompile nachos to have virtually any number of arguments at
+	any length they desire (our default is 8 args at 32 characters each).
+
+
+-----------------
+Lots of memory  |
+-----------------
+kssh> cat bigarray.c
+#include "argdefs.h"
+#include "syscall.h"
+
+int bigarray[2048];
+
+int
+main( int    argc,
+      char  *argv )
+{
+    int i;
+    for( i = 0; i < 2048; i++) 
+    {
+	bigarray[i] = i ;
+	if( i % 128 ) Write( ".",1,1) ;
+    }
+    Write( "\n",1,1 ) ;
+    Exit( 0 );
+}
+
+VM Statistics for cat
+=====================
+Cold Misses:            9
+Capacity Misses:        0
+Conflict Misses:        0
+Total Misses:           9
+
+kssh> bigarray
+............................................................................
+** Many lines ommited **
+............................................................................
+........
+
+VM Statistics for bigarray
+==========================
+Cold Misses:            70
+Capacity Misses:        58
+Conflict Misses:        0
+Total Misses:           128
+
+COMMENT
+	As you can see by the cat of bigarray.c, we are setting the values
+	of an array of ints, of size 2048, to their respective place in the
+	array.
+
+
+------------------
+Way too much mem |
+------------------
+
+kssh> toobigarray
+
+VM Statistics for toobigarray
+=============================
+Cold Misses:            0
+Capacity Misses:        0
+Conflict Misses:        0
+Total Misses:           0
+
+Sorry, out of memory
+
+COMMENT
+	toobigarray is the same code as bigarray, but the size of the int array
+	is 8192, ie. way more than what is in the swapfile.  This demonstrates
+	that we can correctly handle a case where more space that the swapfile
+	has can be requested without crashing our system.
+
+kssh> halt
+
+VM Statistics for all processes
+===============================
+Cold Misses:            125
+Capacity Misses:        0
+Conflict Misses:        0
+Total Misses:           125
+
+Machine halting!
+
+Ticks: total 662896680, idle 662451246, system 249010, user 196424
+Disk I/O: reads 0, writes 0
+Console I/O: reads 118, writes 2889
+Paging: faults 13876
+Network I/O: packets received 0, sent 0
+
+Cleaning up...
+
+COMMENT
+	As you can see, we can still halt.  So our system does not hang forever
+	and all or our old process cleanup has not been effected.
+
+
+-----------------
+Statistics demo |
+-----------------
+
+COMMENT
+	Here is a run of our program with all of our stats in place and 
+	running
+
+Welcome to the Kitchen Sink Shell (kssh) v1.0
+kssh> echo 1 2 3 4 3 2 1
+1 2 3 4 3 2 1
+
+VM Statistics for echo
+======================
+Cold Misses:            8
+Capacity Misses:        0
+Conflict Misses:        0
+Total Misses:           8
+
+kssh> exec
+3
+
+VM Statistics for procCount
+===========================
+Cold Misses:            6
+Capacity Misses:        0
+Conflict Misses:        0
+Total Misses:           6
+
+
+VM Statistics for exec
+======================
+Cold Misses:            4
+Capacity Misses:        0
+Conflict Misses:        0
+Total Misses:           4
+
+kssh> write
+Hello, World
+
+VM Statistics for write
+=======================
+Cold Misses:            5
+Capacity Misses:        0
+Conflict Misses:        0
+Total Misses:           5
+
+kssh> bigarray
+................
+................
+
+VM Statistics for bigarray
+==========================
+Cold Misses:            72
+Capacity Misses:        236
+Conflict Misses:        37
+Total Misses:           345
+
+kssh> matmult
+
+VM Statistics for matmult
+=========================
+Cold Misses:            46
+Capacity Misses:        30566
+Conflict Misses:        5760
+Total Misses:           36372
+
+kssh> sort
+
+VM Statistics for sort
+======================
+Cold Misses:            38
+Capacity Misses:        786931
+Conflict Misses:        471
+Total Misses:           787440
+
+kssh> halt
+
+VM Statistics for all processes
+===============================
+Cold Misses:            184
+Capacity Misses:        817733
+Conflict Misses:        6274
+Total Misses:           824191
+
+Machine halting!
+
+Ticks: total 184663128, idle 65991276, system 98338170, user 20333682
+Disk I/O: reads 0, writes 0
+Console I/O: reads 33, writes 123
+Paging: faults 2199918
+Network I/O: packets received 0, sent 0
+

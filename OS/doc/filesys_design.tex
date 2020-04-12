@@ -1,0 +1,298 @@
+\chapter{File System}
+\section{Introduction}
+\label{xref:introFS}
+  This document explains the changes made to NachOS to implement a file system.
+  This file system will replace the wrapper functions to unix calls that
+  were previously used.
+
+\section{Changes}
+\label{xref:changesFS}
+  \begin{itemize}
+    \item	We made the choice to not use the filehdr or directory 
+		classes that were 
+		provided to us, and we created our own structures. (See section
+		\ref{xref:mtreeFS})
+    \item	\code{NodeCache} and \code{DataCache} will be used to store
+		active nodes and datablocks respectively and will be discussed
+		in detail in sections \ref{xref:nodecacheFS} and 
+		\ref{xref:datacacheFS}.
+    \item	The functions in \code{OpenFile} will no longer be wrappers to
+		the UNIX system calls, but will directly access our internal
+		structures for holding the NachOS file system.
+    \item	\code{ETree} will store all the free extents in our file system
+		and will be described in more detail in section 
+		\ref{xref:etreeFS}.
+    \item	To stick with the standards of our file system and the standards
+		of NachOS, new system calls were added.  See section 
+		\ref{xref:syscallsFS} for more information.
+  \end{itemize} 
+
+\section{System Calls}
+\label{xref:syscallsFS}
+  The system calls added for file functionality return error codes as with
+  the other system calls.  These are system calls that you would expect to see
+  for any filesystem.
+  \\
+  \begin{itemize}
+      \item	\code{int Stat( struct Stat\_t* stat, char* name, int nameSize )}
+      \item	\code{int Chmod( char* name, int nameSize, T\_BYTE perms )}
+      \item     \code{int Unlink( char* name, int nameSize )}
+      \item     \code{int Mkdir( char* name, int nameSize )}
+      \item     \code{int Move(char* name, int nameSize, char* newName, int newNameSize)}
+      \item     \code{int Cd( char* name, int size)}
+  \end{itemize}
+
+\section{FileSystem}
+\label{xref:filesystemFS}
+  We are no longer using wrapper functions for the implementation of
+  our file system, but we are keeping a similar class interface so as to make
+  the merge much smoother.
+  \\
+  \begin{itemize}
+      \item		\code{FileSystem::FileSystem()}
+      \item		\code{FileSystem::\~{}FileSystem()}
+      \item		\code{OpenFile* FileSystem::Open( char* name )} 
+      \item		\code{bool FileSystem::Remove( char* name )}
+  \end{itemize}
+  These function were all modified to use the new underlying file system, 
+  namely the \code{MTree*} classes.  Another change is now that 
+  \code{FileSystem::Remove()} will return an \code{int} to give us better
+  error handling.
+  \\\\
+  The following are new function call signatures and their usage:
+  \\
+  \begin{itemize}
+      \item		\code{void FileSystem::format()}\\
+	Formats the file system. 
+
+      \item		\code{bool FileSystem::Create( char* name, int initialSize=0 )}\\
+	Creates a file (UNIX creat), but we ignore the initalSize.
+      \item		\code{bool FileSystem::mkdir( char* name )} \\
+	Creates a directory (UNIX mkdir).
+
+      \item		\code{MTreeMetaNode*  FileSystem::getMetaNode(const char* fname )}\\
+	Gets the meta data node for file fname.
+      \item		\code{MTreeInternalNode*  FileSystem::getFileNode(const char* fname )}\\
+	Gets the internal node that heads a file subtree fname.
+      \item		\code{MTreeInternalNode*  FileSystem::getFileNode(const char** comps, size\_t len )}\\
+	Similar to the above function, but uses comps (preparsed absolute path)
+	instead of fname.
+      \item		\code{MTreeNode*  FileSystem::getNode( T\_WORD id )}\\
+	Gets a node given the universally unique node id.
+      \item		\code{void  FileSystem::putNode( MTreeNode* node, bool force=false, bool ensureInCache=true )}\\
+	Writes a node to the file system.
+      \item		\code{void  FileSystem::releaseNode( MTreeNode* node )}\\
+	Releases the lock on the node, this must be called on any node 
+	retrieved with getNode().
+      \item		\code{unsigned char*  FileSystem::getData( T\_WORD id )}\\
+	Gets a block of data given the universally unique block id.
+      \item		\code{void  FileSystem::putData( T\_WORD id )}\\
+	Writes a data block to the file system.
+      \item		\code{void  FileSystem::releaseData( T\_WORD id )}\\
+	Releases the lock on a data block, this must be called on any block
+	retrieved with getData().
+      \item		\code{T\_WORD  FileSystem::allocateNode()}\\
+	Allocates a node on the file system.
+      \item		\code{void  FileSystem::freeNode( T\_WORD id )}\\
+	Frees a node on the file system.
+      \item		\code{T\_WORD  FileSystem::allocateDataExtent( T\_WORD start, T\_WORD len~)}\\
+	Allocates a data extent on the file system acording to the arguments
+	passed
+      \item		\code{void  FileSystem::freeDataExtent( T\_WORD start, T\_WORD len )}\\
+	Frees a data extent that is reprsented by the arguments passed.
+  \end{itemize}
+
+  The idea behind \code{getNode()} or \code{getData()}, and their corresponding
+  \code{releaseNode()} or \code{releaseData()} is to synchronize the access
+  to the disc.
+
+\section{OpenFile}
+\label{xref:openfileFS}
+  The interface for \code{OpenFile} is exactly the same as it was in the 
+  projects previous to this.  This interface is unchanged, with the exception
+  of returned error codes, making the migration to our file system much easier.
+  \\\\
+  Every function, however, was rewriten, as the underlying 
+  data structure that represents our file system has changed considerably.
+
+\section{MTree}
+\label{xref:mtreeFS}
+  \code{MTree} is the new class that makes up the underlying data structure
+  that is the file system.  There are four primary types of nodes.  It is
+  important to note that any object of MTreeNode type will be 32 bytes long.
+  \begin{itemize}
+    \item	\code{MTreeNode} is the superclass for all the nodes.  This
+		contains one byte of header information.
+    \item	\code{MtreeRawNode} contains 31 bytes of raw data.
+		(e.g. filenames or free extent info)
+    \item	\code{MtreeInternalNode} provides structure and 
+		branchind. It contains up to four children and
+		15 bytes of unformated data the can be used for additional
+		information.
+    \item	\code{MTreeMetaNode} stores information about a file/directory, such
+		as filename and size.
+    \item	\code{MtreeDataNode} contains to extents that point to actual
+		file data nodes.
+  \end{itemize}
+
+  The basic structure is fairly intuitive.  Directories are an
+  \code{MTreeInternalNode} with its first child pointing to an \code{MTreeMetaNode}.  
+  This node contains information such as size, filename, and permissions.
+  The directory but will be set. The remaining children point to file sub-trees.
+  A file has the same structure, but its \code{MTreeMetaNode} does has the directory bit cleared.
+  It's children are \code{MTreeDataNode}s.
+  This restricts a directory to 3 children.  When all
+  three children of a directory are in use, and a 4th is added, the last 
+  child pointer is set to a new \code{MTreeInternalNode}. This node points to 
+  the previous child the new child being added.
+  This can be done with any level of indirection, allowing a number of children
+  restricted only be available disk space.
+  Due to time and complexity constraints, we only implement one level of indirection allowing
+  for a total of 12 files per directory. \\
+  Indirection in file sub-trees can increase the number of extents a file can have. We
+  did not implement this indirection so a file is limited to 9 extents. This does
+  not place limits on the maximum file size, only the maximum file fragmentation.
+  See section \ref{xref:limitationsFS} for additional restrictions.
+
+\section{ETree}
+\label{xref:etreeFS}
+  \code{ETree} is used to manage free entents.  The root node of the file system, having
+  ID \code{0x0000}, has 2 pointers in its special section. These 
+  point to two \code{MTreeRawNode}s which are root nodes for \code{ETree} objects.
+  An \code{ETreeNode} is simply an abstraction of an \code{MTreeRawNode} and provides
+  functions that store left and right children and extent starts and lengths. An \code{ETree}
+  is a binary search tree containing free extents indexed on length. One \code{ETree} contains
+  free node extents and the other contains free data block extents.\\
+
+  The logic behind \code{ETree::putNode()} and \code{ETree::releaseNode()} is similar to
+  \code{BinaryTree} in the \code{FileSystem} class.
+
+\section{Cache}
+\label{xref:cacheFS}
+  \code{Cache} is the superclass for the node and data block caching syste.
+  It implements the raw access to disk based on an ``address'' rather than a disk sector.
+  \code{Cache} abstracts the disk an array of bytes. The parent class \code{Cache} also
+  holds the caching data structure. The constructor of this class accepts
+  the maximum size of the cache.\\
+  \code{NodeCache} and \code{DataCache} implement the 
+  remaining parts of a cache for caching nodes and data chunks respectively.
+  Nodes are 32 bytes.  Data chunks are 128 bytes which corresponds to a sector size.
+  Minimal changes are required to increase the data chunk size to a larger multiple
+  of the sector size. The singleton \code{NodeCache} object is currently
+  of size 64 and the data cache is of size 32.\\
+
+  The parent class \code{Cache} has an abstract function that its children
+  must implement.  This makes space in the cache.  It is a public 
+  function to make \code{n} ``slots'' available in the cache.\\
+  \code{virtual void makeSpaceFor( unsigned int numItems ) = 0}
+
+\section{DataCache}
+\label{xref:datacacheFS}
+  \code{DataCache} is a subclass of \code{Cache}.  This class gets
+  data chunks (sector sized) off the disk and caches them writing them
+  back to disk when requested. This class keeps more than one client
+  from accessing a given data block, or chunk at a given time.
+
+  \begin{itemize}
+      \item	\code{unsigned char* getChunk( T\_WORD id )}
+      \item     \code{void giveUpChunk( T\_WORD id )}
+      \item     \code{void freeChunk( T\_WORD id )}
+      \item	\code{void writeOutChunk( T\_WORD id, bool force = false )}
+  \end{itemize}
+
+  These functions accept a chunk id which is unique.  The
+  Boolean argument \code{force} in \code{writeOutChunk} will force an 
+  immediate write to disk.  Otherwise, the data will be written to 
+  disk when it is removed from cache.
+
+\section{NodeCache}
+\label{xref:nodecacheFS}
+  \code{NodeCache} is another subclass of \code{Cache}.  
+  This class will gets nodes off disk and caches them writing them
+  back to disk when requested. This class prevents more than one client
+  from accessing a node at a given time.
+
+  \begin{itemize}
+      \item	\code{MTreeNode* getNode( T\_WORD id )}
+      \item     \code{void giveUpNode( MTreeNode* node )}
+      \item	\code{void freeNode( T\_WORD id )}
+      \item	\code{void writeOutNode( MTreeNode* node,} 
+				 \code{bool force = false, }
+				 \code{bool ensureInCache = true)}
+  \end{itemize}
+
+  These functions work similarlty to \code{DataCache}'s functions.  (See
+  section \ref{xref:datacacheFS})  The addition argument to \code{writeOutNode},
+  \code{ensureInCache} ensures that the item
+  being written out will be in cache afterwards. This is used when adding a new node
+  to then cache/disk.
+
+\section{Structs}
+\label{xref:structsFS}
+    \code{Stat\_t}
+    \\
+    A struct that houses various file information.
+    \\
+    \begin{tabular}{|lll|}
+    \hline
+      \code{T\_BYTE} & \code{mode\_}      & The permissions of the file.     \\
+      \code{char*}   & \code{filename\_}  & The name of the file.	     \\
+      \code{bool}    & \code{directory\_} & Is this representing a directory?\\
+      \code{T\_WORD} & \code{size\_}      & The current size of the file.    \\
+      \code{T\_WORD} & \code{id\_}        & A unique node id.                \\
+    \hline
+    \end{tabular}
+    \\\\
+    \code{ChunkInfo\_t}
+    \\
+    This struct definition is private to the \code{DataCache} class.  It is
+    used to keep track of info about data chunks in a \code{DataCache}
+    object.
+    \\
+    \begin{tabular}{|lll|}
+    \hline
+      \code{unsigned char*} & \code{chunk\_}	& Reference chunk in memory \\
+      \code{T\_WORD}        & \code{id\_}       & Unique id of chunk\\
+      \code{T\_WORD}        & \code{diskAddr\_} & Disk address of chunk in bytes\\
+      \code{bool}           & \code{inUse\_}	& Used to lock a chunk\\
+      \code{bool}           & \code{dirty\_}    & Has data been modified?\\
+    \hline
+    \end{tabular}
+    \\
+
+\section{Limitations}
+\label{xref:limitationsFS}
+  \begin{itemize}
+    \item	Filename length is limited to 123 characters. This limitation
+		is dur to our implementation, not our design. A \code{MTreeMetaNode}
+		contains up to four sub-trees for filename information. Our implementation
+		allows only \code{MTreeRawNode}'s and not indirection \code{MTreeInternalNode}'s.
+		This limits us to $4\cdot31$ characters including a trailing \code{NULL}.
+    \item	File and directory children are limited to one level of
+		indirection.  This is not a design limitation, but an implementation limit.
+		Consequently, we can have only 12 files per directory.
+    \item	When formating the system, NachOS will not allow you to 
+		continue, but will exit after the the format.  This is the
+		same for a UNIX to NachOS file copy.
+    \item	When a filesystem is formatted, the sizes of the initial free node extent
+		and free data extent are specified. This limites the maximum number
+		of files/directories and the maximum amount of data. The file system design
+		allows this distribution to be updated dynamically but the code
+		has not been implemented. Currently, $\frac{1}{4}$ of the space is given to nodes
+		and the remainder is given to data blocks.to do this is not implemented.
+    \item	There is a significant amount of error handling that is not performed, mostly in userland
+    		programs. This can cause strange behavior in certain circumstances. Due to
+		time limitations, this error handling has not been implemented so care must be
+		taken when performing certain operations.
+    \item	Certain functions are buggy. Most of the code for the filesystem had been written
+    		and tested but remains buggy. This is due to time limitations.
+    \item	Some desired features have not been implemented due to time limitations. Most notably,
+    		journaling support does not exist. The root node of the file system has room for a single
+		data extent in its \code{special} section. This would point to a fixed length journal. All
+		modifications to meta data would be written to this journal before they are performed
+		and marked when completed. This allows for faster and more complete filesystem repair
+		should the system crash. Since nachos is a userland file and crashes in the middle of writes
+		are unlikely, this feature is unecessary.
+    \item	We would like to reimplement \code{ETree} to use a balanced tree such as a B$^*$-tree,
+		allowing for more efficient searches.
+  \end{itemize}

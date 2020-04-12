@@ -1,0 +1,163 @@
+
+TESTCASES: p544-01b
+===================
+
+NOTES:
+------
+** Also view nachos/filesys/README
+
+** nachos must be run from the nachos/test directory to work correctly.
+
+** We wrote a "Real Kitchen Sink" shell (meaning it resides completely
+	in kernel space) for ease of testing.  This can be run by 
+	running nachos with the '-ksink' flag. In order to use the "dump"
+	function, you should run nachos as:
+    ../filesys/nachos -d u -ksink
+        command can be obtasined by typing help
+	to dump the filesystem tree, type dump <root node>
+	dump 0   dumps the whole tree
+	dump 1   dumps the free node extents tree
+	dump 2   dumps the free data extents tree
+
+** Type 'make copy' in the nachos/test directory and it will set you up 
+	a complete system and all our binaries to play with.
+
+** mv, cp do not work, any attempt to use them will cause unpredictable results
+	rm is flacky at best.
+
+++++++++++++++++++++
+++++  * KEY *	++++
+++++++++++++++++++++
+
+--------
+one    |		- one is the current section of 
+--------		  the testcase your are in
+
+COMMENT			- comments
+
+Real Kitchen Sink>	- our '-ksink' prompt
+
+kssh>			- our shell prompt
+
+
+++++++++++++++++++++
+++++  */KEY *	++++
+++++++++++++++++++++
+
+----------------------
+USING -ksink flag    |
+----------------------
+Script started on Thu Nov 15 10:58:50 2001
+etf2954@connecticut ~/work/nachos/test >> ../filesys/nachos -ksink
+Real Kitchen Sink> ls /
+total 0
+Real Kitchen Sink> mkdir dir1
+Real Kitchen Sink> mkdir dir2
+Real Kitchen Sink> mkdir dir1/dir1
+Real Kitchen Sink> ls /dir1
+total 1
+drwx     0 dir1
+Real Kitchen Sink> ls /dir1/dir1
+total 0
+Real Kitchen Sink> touch /file1
+Real Kitchen Sink> touch /file2
+Real Kitchen Sink> touch /file3
+Real Kitchen Sink> touch /file4
+Real Kitchen Sink> touch /file5
+Real Kitchen Sink> ls /
+total 7
+drwx     1 dir1
+drwx     0 dir2
+-rw-     0 file5
+-rw-     0 file1
+-rw-     0 file2
+-rw-     0 file3
+-rw-     0 file4
+Real Kitchen Sink> rm file5
+Real Kitchen Sink> ls /
+total 6
+drwx     1 dir1
+drwx     0 dir2
+-rw-     0 file1
+-rw-     0 file2
+-rw-     0 file3
+-rw-     0 file4
+...
+
+COMMENT:
+	This shows much of our directory heirarchy, create, mkdir, and removing
+	files, it's pretty obvious.
+
+
+-----------
+Our Shell |
+-----------
+
+NOTE: There is a issue with stablility, if these commands are issues one after
+	another they might not work.  But in and of themselves seem to work
+	okay.
+
+Welcome to the Kitchen Sink Shell (kssh) v1.3
+kssh> /bin/ls /			COMMENT: Userland ls
+drwx    11 bin
+-rw- 31104 nachosSwap.swp
+-rw-   658 mv.c
+kssh> /bin/cat /mv.c		COMMENT: Userland cat
+// mv.c
+// move a file to a new location
+
+#include "syscall.h"
+#include "lib.h"
+***** MISSING STUFF
+  return i;
+}
+
+kssh> /bin/mkdir /dir1		COMMENT: Userland mkdir
+kssh> /bin/ls /
+drwx    11 bin
+-rw- 31872 nachosSwap.swp
+-rw-   658 mv.c
+drwx     0 dir1
+kssh> /bin/touch /thisisareallylongfilenamealsdkfjalsjfdalskdfjalskdfjalsdkfja;fja;fdkjas;fjas;jfasdlkfj
+kssh> /bin/ls /
+drwx    11 bin
+-rw- 31360 nachosSwap.swp
+-rw-   658 mv.c
+-rw-     0 thisisareallylongfilenamealsdkf
+Cleaning up...
+COMMENT:  This filename trucation is 'caused by the userland ls,
+	shown below is the internal shell showing the correct filename
+** 
+** etf2954@connecticut ~/work/nachos/test >> ../filesys/nachos -ksink
+** Real Kitchen Sink> touch /thisklfdajsldkfjasldkfjasdkjfasdfkjasdlfkajsd;flkasjdflksdjflksdjflksdjflsdkj
+** Real Kitchen Sink> ls /
+** total 5
+** drwx    11 bin
+** -rw- 30720 nachosSwap.swp
+** -rw-   658 mv.c
+** -rw-     0 thisisareallylongfilenameals
+** -rw-     0 thisklfdajsldkfjasldkfjasdkjfasdfkjasdlfkajsd;flkasjdflksdjflksdjflksdjflsdkj
+** Real Kitchen Sink> 
+** 
+
+kssh> echoHW			COMMENT: Userland write to file
+kssh> /bin/ls /
+drwx    11 bin
+-rw- 31616 nachosSwap.swp
+-rw-    13 demoHW
+-rw-   658 mv.c
+-rw-   616 echoHW
+kssh> /bin/cat demoHW		COMMENT: Userland read from files
+Hello, World
+kssh> /bin/halt
+Machine halting!
+
+Ticks: total 228964202, idle 228808773, system 71580, user 83849
+Disk I/O: reads 136, writes 28
+Console I/O: reads 51, writes 278
+Paging: faults 516
+Network I/O: packets received 0, sent 0
+
+Cleaning up...
+
+COMMENT: Cleanup still works, etc.
