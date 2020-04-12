@@ -1,0 +1,32 @@
+function balances()
+{
+    console.log("Current time: " + new Date()) ;
+    var totalBal = 0 ; for (var acctNum in eth.accounts) { var acct = eth.accounts[acctNum] ;
+        var acctBal = web3.fromWei(eth.getBalance(acct), "ether") ;
+        totalBal += parseFloat(acctBal) ;
+        console.log("[" + acctNum + "] " + acct + " balance: " + acctBal + " ether") ;
+    }
+    console.log("  Total balance: " + totalBal + " ether") ;
+    return true ;
+} ;
+
+function unlock()
+{
+    return web3.personal.unlockAccount(eth.coinbase) ;
+} ;
+
+function sync()
+{
+    console.log("Current time: " + new Date()) ;
+    if(eth.syncing)
+    {
+        var blocksToGo = eth.syncing.highestBlock - eth.syncing.currentBlock ;
+        console.log("Latest: " + eth.syncing.currentBlock + "\tHighest: " + eth.syncing.highestBlock + " to go: " + blocksToGo) ;
+    }
+    else
+    {
+        console.log("Up to date.") ;
+    }
+    return true ;
+} ;
+
