@@ -1,0 +1,26 @@
+TARGET=		helloworld
+CC=		clang
+CCFLAGS=	
+LINK=		clang
+LINKFLAGS=	-framework Foundation
+RM=		rm
+
+# Targets
+all:		$(TARGET)
+
+clean:
+	-$(RM) $(TARGET).o
+
+realclean:	clean
+	-$(RM) $(TARGET)
+	-$(RM) $(TARGET).core
+
+$(TARGET):	$(TARGET).o
+	$(LINK) $(LINKFLAGS) -o $@ $?
+
+
+# Suffix Rules
+.SUFFIXES:
+.SUFFIXES: 	.m .o
+.m.o:
+	$(CC) $(CCFLAGS) -c $<
