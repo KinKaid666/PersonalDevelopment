@@ -1,0 +1,2 @@
+#! /bin/sh
+./anagrams words `wc -l words | tr -d "[words]"`

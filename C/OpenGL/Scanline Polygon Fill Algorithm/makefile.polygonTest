@@ -1,0 +1,19 @@
+CC	= gcc
+CCFLAGS = -g -ansi
+TARGET	= polygonTest
+OBJECTS = polygonTest.o drawPolygon.o
+
+INCLUDE =
+LDFLAGS =
+LDLIBS = -framework OpenGL -framework GLUT
+
+$(TARGET):$(OBJECTS)
+	$(CC) $(LDFLAGS) $(LDLIBS) -o $@ $(OBJECTS)
+
+# Suffix Rules
+.SUFFIXES:
+.SUFFIXES:      .c .o
+.c.o:
+	$(CC) $(CCFLAGS) -c $< $(INCLUDE)
+
+$(TARGET):	$(OBJECTS) 

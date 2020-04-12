@@ -1,0 +1,20 @@
+CC	= gcc
+CCFLAGS = -g -ansi
+TARGET	= lineTest
+OBJECTS = lineTest.o drawLine.o
+
+INCLUDE = -I/usr/X11R6/include/GL
+LDFLAGS = -L/usr/X11R6/lib
+#LDLIBS = -lglut -lGLU -lGLw -lGL -lGLw -lXmu -lXext -lX11 -lm
+LDLIBS = -lm -framework OpenGL -framework GLUT
+
+$(TARGET):
+	$(CC) $(LDFLAGS) $(LDLIBS) -o $@ $(OBJECTS)
+
+# Suffix Rules
+.SUFFIXES:
+.SUFFIXES:      .c .o
+.c.o:
+	$(CC) $(CCFLAGS) -c $< $(INCLUDE)
+
+$(TARGET):	$(OBJECTS)
