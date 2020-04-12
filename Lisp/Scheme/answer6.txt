@@ -1,0 +1,123 @@
+*** Exercise 1 ***
+
+(define rember-all
+    (lambda ( x s )
+	( filter$ (lambda (y) (not (eq? x y))) s)))
+
+(define subst-all 
+    (lambda (x y s)
+	(map$ (lambda (z) (if (eq? x z) y z))
+	s)))
+
+*** Exercise 2 ***
+
+(define member$
+    (lambda (x s less-than-or-equal)
+	(if (less-than-or-equal (car$ s) x)
+	    (if (less-than-or-equal x (car$ s))
+		#t
+		(member$ x (cdr$ s) less-than-or-equal))
+	    #f)))
+
+*** Exercise 3 ***
+
+(define fourmults
+    (lambda (x)
+	(cons$ x (fourmults (+ 4 x)))))
+
+*** Exercise 4 ***
+
+(define nextrat
+    (lambda (r)
+        (let ([x (car r)] [y (cdr r)])
+          (cond
+            [(= y 1) (cons 1 (+ x y))]
+            [else (cons (+ x 1) (- y 1))]))))
+
+*** Exercise 5 ***
+
+(define filtermult$
+    (lambda (n s)
+	(if (zero? (remainder (car$ s) n))
+	    (filtermult$ n (cdr$ s))
+	    (cons$ (car$ s) (filtermult$ n (cdr$ s))))))
+
+(define sieve$
+    (lambda (s)
+	(cons$ (car$ s) (sieve$ (filtermult$ (car$ s) (cdr$ s))))))
+
+(define integers$
+    (lambda (x)
+        (cons$ x (integers$ (+ 1 x)))))
+
+(define primes$
+    (sieve$ (integers$ 2))))
+
+*** Exercise 6 ***
+
+(define prime$
+    (lambda (x)
+        (member$ x primes$ <=)))
+
+I really couldn't tell how long it took for 1,2,3 or 4 digits but it seemed
+    to take about 6 seconds for 5 digits.  This is because is checks all the 
+    numbers in the set of primes.  Instead of doing Eulers method or anything 
+    like that.  So it checks 2,3,5,7....etc.  By the time it gets to 5 digit 
+    numbers I'm sure there is only like 10-20 primes/100 integers so it would 
+    seem to me that it would be a log curve to it, but based on the number of 
+    digits in the number, it would be x^n, where n is the number of digits in 
+    the number (pure guess).
+    
+*** Exercise 7 ***
+
+(define fib
+    (lambda () 
+        (cons$ 0 fib_helper)))
+
+(define fib_helper
+    (cons$ 1 (+$ fib_helper (cons$ 0 fib_helper))))
+
+*** Exercise 8 ***
+
+(define grune-a-b
+  (lambda (s)
+    (if (empty-stream? s) 
+	'the-empty-stream 
+        (let ((firstread (car$ s)))
+          (cond
+	    [(eq? firstread 'a) 
+		  (let* [(thiscdr (cdr$ s)) (secondread (car$ thiscdr))]
+	           (cond
+		       [(eq? secondread 'a) (cons$ 'b (grune-a-b (cdr$ s)))]
+		       [else (cons$ firstread 
+				    (cons$ secondread 
+				           (grune-a-b (cdr$ s))))]))]
+	    [else (cons$ firstread (grune-a-b (cdr$ s)))])))))
+
+*** Exercise 9 ***
+
+(define grune
+ (lambda (x y)
+    (lambda (s)
+      (if (empty-stream? s) 
+	  'the-empty-stream 
+	  (let ((firstread (car$ s)))
+	    (cond
+	      [(eq? firstread x) 
+		    (let* [(thiscdr (cdr$ s)) (secondread (car$ thiscdr))]
+		     (cond
+			 [(eq? secondread x) (cons$ y ((grune x y) (cdr$ s)))]
+			 [else (cons$ firstread 
+				      (cons$ secondread 
+					     ((grune x y) (cdr$ s))))]))]
+	      [else (cons$ firstread ((grune x y) (cdr$ s)))]))))))
+
+*** Exercise 10 ***
+
+(define grune*
+  (lambda (l)
+    (lambda (s)
+      (cond
+	    [(null? l) s]
+            [else ((grune* (cdr l)) ((grune (caar l)(cadar l)) s))]))))
+

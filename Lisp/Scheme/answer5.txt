@@ -1,0 +1,351 @@
+Exercise 1
+
+(load "smm.ss")
+
+(define <point-class>
+  (class (x y)
+	 ([visible #f])
+	 (<object>)
+	 ([Location?
+	   (method ()	
+		   (if (numbers? x y)
+		       (list x y)
+		       (begin
+			 (printf "I don't know~%")
+			 (list x y))))]
+	  [Visible?
+	   (method ()
+		   visible)]
+	  [MoveTo
+	   (method (newx newy)
+		   (if (numbers? x y newx newy) 
+		       ( if ( and ( and ( < newx 1024 ) ( > newx -1 ))
+			          ( and ( < newy 1024 ) ( > newy -1 )) )
+			    ( begin	
+			       (set! x newx)
+			       (set! y newy)
+			       (list x y)    )
+			    (error 'MoveTo "arguments are not between 0 & 1023 inclusive"))
+		       (error 'MoveTo "arguments passed are not both numbers")))]
+	  [MoveRel
+	   (method (newx newy)
+		   (if (numbers? x y newx newy) 
+		       (begin
+			 (set! x (+ x newx))
+			 (set! y (+ y newy))
+			 (list x y))
+		       (error 'MoveRel "no move to non-numeric position")))]
+	  [SetVisible
+	   (method (value)
+		   (set! visible (if value #t #f))
+		   visible)])))
+
+(define numbers? (lambda n (andmap number? n)))
+
+Exercise 2
+
+(load "smm.ss")
+
+(define <opoint-class>
+  (class (x y)
+	 ([origin-x 0]
+	  [origin-y 0])
+	 (<object>)
+	 ([WhereLoc?
+	   (method ()	
+		   (if (numbers? x y)
+		       (list x y)
+		       (begin
+			 (printf "I don't know~%")
+			 (list x y))))]
+	  [WhereGlob?
+	   (method ()	
+		   (if (numbers? x y)
+		       (list (- x origin-x ) (- y origin-y ))
+		       (begin
+			 (printf "I don't know~%")
+			 (list x y))))]
+	  [OriginDistance?
+	   (method ()
+		   (if (numbers? x y)
+		       (list (- 0 origin-x ) (- 0 origin-y ))
+		       (begin
+			 (printf "I don't know~%")
+			 (list x y))))]
+	  [MoveTo
+	   (method (newx newy)
+		   (if (numbers? x y newx newy) 
+		       ( if ( and ( and ( < newx 1024 ) ( > newx -1 ))
+			          ( and ( < newy 1024 ) ( > newy -1 )) )
+			    ( begin	
+			       (set! x newx)
+			       (set! y newy)
+			       (list x y)    )
+			    (error 'MoveTo "arguments are not between 0 & 1023 inclusive"))
+		       (error 'MoveTo "arguments passed are not both numbers")))]
+	  [MoveOrigin
+	   (method (newx newy)
+		   (if (numbers? x y newx newy) 
+		       ( if ( and ( and ( < newx 1024 ) ( > newx -1 ))
+			          ( and ( < newy 1024 ) ( > newy -1 )) )
+			    ( begin	
+			       (set! origin-x (- 0 newx))
+			       (set! origin-y (- 0 newy))
+			       (list (- x origin-x ) (- y origin-y ))    )
+			    (error 'MoveTo "arguments are not between 0 & 1023 inclusive"))
+		       (error 'MoveTo "arguments passed are not both numbers")))]
+	  [MoveRel
+	   (method (newx newy)
+		   (if (numbers? x y newx newy) 
+		       (begin
+			 (set! x (+ x newx))
+			 (set! y (+ y newy))
+			 (list x y))
+		       (error 'MoveRel "no move to non-numeric position")))])))
+
+(define numbers? (lambda n (andmap number? n)))
+
+Exercise 3
+(load "smm.ss")
+
+(define <point-class>
+  (class (x y)
+	 ([visible #f]
+	  [resolution ( list 0 1023 )]
+	  [output (lambda () (printf "I am at \(~s,~s\)~%" x y ))])
+	 (<object>)
+	 ([Location?
+	   (method ()	
+		   (if (numbers? x y)
+		       ( if visible
+		            (output)
+			    ( begin(display "Sorry, I'm hiding." )(newline)))
+		       (begin
+			 (printf "I don't know~%")
+			 (list x y))))]
+	  [Visible?
+	   (method ()
+		   ( if visible
+			( begin (display "I am visible" )(newline))
+			( begin (display "I am invisible")(newline))))]
+	  [MoveTo
+	   (method (newx newy)
+		   (if (numbers? x y newx newy) 
+		       ( if ( and ( and ( < newx 1024 ) ( > newx -1 ))
+			          ( and ( < newy 1024 ) ( > newy -1 )) )
+			    ( begin	
+			       (set! x newx)
+			       (set! y newy)
+			       (output)    )
+			    (error 'MoveTo "arguments are not between 0 & 1023 inclusive"))
+		       (error 'MoveTo "arguments passed are not both numbers")))]
+	  [MoveRel
+	   (method (newx newy)
+		   (if (numbers? x y newx newy) 
+		       (begin
+			 (set! x (+ x newx))
+			 (set! y (+ y newy))
+			 (output))
+		       (error 'MoveRel "no move to non-numeric position")))]
+	  [SetVisible
+	   (method (value)
+		   (set! visible (if value #t #f))
+		   ( if visible
+			( begin (display "I am visible" )(newline))
+			( begin (display "I am invisible")(newline))))])))
+
+(define numbers? (lambda n (andmap number? n)))
+
+Exercise 4
+
+(define <rectangle>
+  (class ( x1 y1 x2 y2 )
+	 ()
+	 (<polygon> 
+	     x1 y1  
+	     x2 y1  
+	     x2 y2  
+	     x1 y2 )
+	 ()))
+
+(define <square>
+  (class ( x1 y1 h )
+	 ()
+	 (<polygon> 
+	     x1       y1  
+	     (+ x1 h) y1  
+	     (+ x1 h) (+ y1 h)
+	     x1       (+ y1 h) )
+	 ()))
+
+Exercise 5
+
+(define <ellipse>
+  (class ( x1 y1  x2 y2
+    ()
+    (<filled-shape>)
+    ([draw (method ()
+	(call create super 'oval (list x1 y2 x2 y2)))])))
+
+(define <circle>
+  (class (center_X center_Y r)
+    ()
+    (<ellipse> (- center_X r) (- center_Y r)
+	       (+ center_X r) (- center_Y r))
+    ()))
+
+Exercise 6
+
+(define <filled-shape>
+  (class ()
+      ()
+      (<shape>)
+      ([width 
+	  (method (value)
+	    (call configure super 'width value))]
+       [outline-color
+	  (method (value)
+	    (call configure super 'outline value))]
+       [fill-color
+	  (method (value)
+	    (call configure super 'fill value))]
+       [color
+	 (method (value)
+	   (begin (call fill-color this value)
+		  (call outline-color this value)))])))
+Exercise 7
+
+(define <framedsquare>
+  (class (x1 y1 length)
+     ()
+     (<square> x1 y1 length)
+     ([color
+       (method (value) 
+	 (call fill-color this value))])))
+
+Exercise 8
+
+(load "spm.ss")
+
+(define <account>
+  (class (user-pin)
+    ([num-transactions 0]
+     [vol-transactions 0]
+     [interest-rate 0.025]
+     [bank-code 12345]
+     [output (lambda (a) (printf "The balance is $~s~%" a))])
+    ([balance 0])       
+    (<object>)         
+    ([balance?
+       (method () balance)]
+     [deposit
+       (method (amount)
+	 (if (> amount 0)
+	     (begin
+	       (set! num-transactions (+ 1 num-transactions))
+	       (set! vol-transactions (+ amount vol-transactions))
+	       (set! balance (+ balance amount))
+	       (output balance))))] 
+     [withdraw
+       (method (amount pin)
+         (if (and (= user-pin pin) (> amount 0) (>= balance amount))
+	     (begin
+	       (set! num-transactions (+ 1 num-transactions))
+	       (set! vol-transactions (+ amount vol-transactions))
+	       (set! balance (- balance amount))
+	       (output balance))
+	     (error 'withdraw 
+		    "check your pin or withdrawal amount")))]
+     [add-interest
+       (method (code)
+	 (if (= code bank-code)
+	     (call deposit this (* balance interest-rate)) 
+	     (error 'add-interest "invalid bank access code")))]
+     [transaction-info
+       (method (code)
+	 (if (= code bank-code)
+	     (begin
+	       (printf "There have been ~s" num-transactions)
+	       (printf " total transactions with a total of $~s~%"
+		       vol-transactions))
+	     (error 'transaction-info "invalid bank access code")))]
+     [set-interest
+       (method (new code)
+	 (if (= code bank-code)
+	     (set! interest-rate new)
+	     (error 'set-interest "invalid bank access code")))])))
+
+Exercise 9
+
+(define <account>
+  (class ()
+    ([num-transactions 0]          
+     [vol-transactions 0]
+     [interest-rate 0.025]
+     [bank-code 12345]
+     [all-instances '()]
+     [output (lambda (a) (printf "The balance is $~s~%" a))])
+    ([balance 0]
+     [user-pin (+ 1000 (random 9000))])   
+    (<object>) 
+    ([balance? 
+      (method () balance)]
+     [deposit
+      (method (amount)
+	(if (> amount 0)
+	    (begin
+	      (set! num-transactions (+ 1 num-transactions))
+	      (set! vol-transactions (+ amount vol-transactions))
+	      (set! balance (+ balance amount))
+	      (output balance))))]
+     [withdraw
+      (method (amount pin)
+	(if (and (= user-pin pin) (> amount 0) (>= balance amount))
+	    (begin
+	      (set! num-transactions (+ 1 num-transactions))
+	      (set! vol-transactions (+ amount vol-transactions))
+	      (set! balance (- balance amount))
+	      (output balance))
+	    (error 'withdraw 
+		   "check your pin or withdrawal amount")))]
+     [add-interest
+      (method (code)
+	(if (= code bank-code)
+	    (for-each
+	     (lambda (i)
+	       (call deposit i (* (call balance? i) interest-rate)))
+	     all-instances)
+	    (error 'add-interest "invalid bank access code")))]
+     [set-interest
+      (method (new-rate code)
+	(if (= code bank-code)
+	    (set! interest-rate new-rate)
+	    (error 'set-interest "invalid bank access code")))]
+     [change-pin
+      (method ()
+	(let ((input-pin (begin (printf "Enter your old pin > ")
+				(read))))
+	  (if (= input-pin user-pin)
+	      (let ((new-pin (begin (printf "Enter your new pin > ")
+				    (read))))
+		(let ((again (begin (printf "Enter it again > ")
+				    (read))))
+		  (if (= again new-pin)
+		      (set! user-pin new-pin)
+		      (error 'change-pin "No match on retype"))))
+	      (error 'change-pin "Wrong old pin entered"))))]
+     [bank-change-pin
+      (method (new-pin code)
+	(if (= code bank-code)
+	    (set! user-pin new-pin)
+	    (error 'bank-change-pin "invalid bank access code")))]
+     [transaction-info
+       (method (code)
+	 (if (= code bank-code)
+	     (begin
+	       (printf "There have been ~s" num-transactions)
+	       (printf " total transactions with a total of $~s~%"
+		       vol-transactions))
+	     (error 'transaction-info "invalid bank access code")))])
+    (set! all-instances (cons this all-instances))
+    (printf "Your user pin is ~s.  Don't forget it!~%" user-pin)))

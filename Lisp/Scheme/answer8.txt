@@ -1,0 +1,42 @@
+*** Exercise 1 ***
+*** Exercise 2 ***
+
+(load "record.ss")
+(load "error.ss")
+
+(define-record lit (datum))
+(define-record varref (var))
+(define-record lambda (formal body))
+(define-record app (rator rand))
+(define-record if (test-exp then-exp else-exp))
+
+(define parse-2
+  (lambda (datum)
+     (cond
+	((number? datum) (make-lit datum))
+	((symbol? datum) (make-varref datum))
+	((pair? datum) (let ((first (car datum)))
+			 (if (eq? first 'lambda)
+	                     (make-lambda (cadr datum) (parse-2 (caddr datum)))
+			     (if (eq? first 'if)
+				 (make-if (parse-2 (cadr  datum)) 
+					  (parse-2 (caddr datum))
+					  (parse-2 (cadddr datum)))
+                                 (make-app (parse-2 (car datum)) 
+					   (map parse-2 (cdr datum)))))))
+	(else (error 'parse-2 "Invalid concrete syntax ~s" datum)))))
+
+(define unparse-2
+    (lambda (exp)
+        (variant-case exp
+		      (lit (datum) datum)
+		      (varref (var) var)
+		      (lambda (formals body)
+		         (list 'lambda formals (unparse-2 body)))
+		      (if (test-exp then-exp else-exp)
+			 (list 'if (unparse-2 test-exp)
+				   (unparse-2 then-exp)
+				   (unparse-2 else-exp)))
+		      (app (rator rand) (cons (unparse-2 rator) (map unparse-2 rand)))
+		      (else (error 'unparse-2  ": Invalid abstract syntax ~d" 
+				        exp )))))

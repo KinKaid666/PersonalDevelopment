@@ -1,0 +1,126 @@
+Exercise 1
+
+( define curry-maker
+    ( lambda ( function )
+	( lambda ( x ) 
+	    ( lambda ( y )
+	        ( function x y )))))
+
+Exercise 2
+
+( define sq ( lambda ( x ) ( * x x )))
+( define sum_of_squares
+    ( lambda ( l ) 
+	( cond 
+	    ( ( null? l ) 0 )
+	    ( else ( + ( sq ( car l ) ) ( sum_of_squares ( cdr l ) ))))))
+( define mag
+    ( lambda l
+	 ( cond 
+	     ( ( null? l ) 0 )
+	     ( else ( sqrt ( sum_of_squares l ) )))))
+
+
+( define multi-compose
+    ( lambda p
+	( lambda l
+	    ( cond 
+	        ( ( null? p ) l )
+		( else ( apply ( car p ) 
+		               ( apply 
+				   ( apply multi-compose ( cdr p ) )
+				   l ))))))))
+
+Exercise 3
+
+( define norm
+    ( lambda ( l )
+	( cond
+	    ( ( null? l ) l )
+	    ( else ( map ( lambda ( x ) ( / x ( apply mag l ) )) l )))))
+
+x = length list
+cost to run = x ( k * j )
+
+Exercise 4
+
+( define and-map
+    ( lambda ( proc l )
+	( cond
+	    ( ( null? l ) #t )
+	    ( ( and ( proc ( car l ) ) ( and-map proc ( cdr l ))) #t )
+	    ( else #f ))))
+
+Exercise 5
+
+( define weight
+    ( lambda ( l )
+        ( fold ( lambda ( x y ) ( + ( cadr x ) y )) 0 l )))
+	    
+( define heaviest
+    ( lambda ( l )
+        ( fold ( lambda ( x y )
+		   ( cond 
+		       ( ( > ( cadr x ) y ) ( cadr x ) )
+		       ( else  y ))) 0 l )))
+		       
+( define filter
+    ( lambda ( l )
+	( fold ( lambda ( x y )
+		   ( cond 
+		       ( ( > ( cadr x ) 0 ) ( cons x ( filter y )))
+		       ( else ( filter y ))))
+		       '() l )))
+
+
+Exercise 6
+
+The the memeber? calls, it's obvious it will go threw the list
+	until it finds what it is looking for and then exit.
+	If it doesn't find what it's looking for it will go threw
+	the list n+1 number of times, where n is the number of elements
+
+Since member-abst? is defined w/ the recursive abstractness
+	it will go threw the whole list every time, whether it finds
+	the element or not, and then give you an answer.
+
+Exercise 7
+
+( define find-and-report
+    ( lambda ( proc func base-case l )
+        ( cond
+            ( ( null? l ) base-case )
+	    ( ( proc ( car l ) ) ( func l ))
+	    ( else ( find-and-report proc func base-case ( cdr l ))))))
+
+Exercise 8
+
+( define deep-recur-check
+  ( lambda ( shallow-proc deep-proc pred succ-proc base-case ls )
+      ( letrec (( helper
+                  (lambda (l)
+		      ( cond
+		          [ ( null? l ) base-case ]
+			  [ else ( if ( pred ( car l ) )
+				      ( succ-proc l )
+				      ( cond
+					  [ ( atom? ( car l ) ) ( shallow-proc 
+							       ( car l )
+							       ( helper ( cdr l )))]
+					  [ else ( deep-proc 
+						   ( helper ( car l ))
+						   ( helper ( cdr l )))]))]))))
+			
+	      ( helper ls ))))
+
+( define member*
+    ( lambda ( item ls )
+	 ( deep-recur-check ( lambda ( x y ) y )
+			    ( lambda ( x y ) ( if x 
+						  x 
+						  y ))
+			    ( lambda ( x ) ( equal? x item ) )
+			    ( lambda ( x ) x )
+			    #f
+			    ls )))
+					  

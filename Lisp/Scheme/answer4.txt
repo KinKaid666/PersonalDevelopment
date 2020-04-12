@@ -1,0 +1,180 @@
+Exercise 1
+
+( define bar3
+    ( lambda ( x )
+	( display "before : " )
+	( display x )
+	( newline )
+	( string-set! x 0 #\X )
+	( display "after  : " )
+	( display x )
+	( newline )))
+
+Result: Scheme usese call by reference when using strings.
+
+Exercise 2
+
+(VAR foo 23)	; creating a box with 23 in it
+(VAR goo 94)    ; creating a box with 94 in it
+
+( define swap	                  	; typical define statement
+    ( proc-by-ref (a b)			; beginning of a function that will 
+					;	return a function
+        (LOCALVAR ([temp 'irrelevant])  ; creating a local variable3
+					;	and initializing it to 
+					;	'irrelevant
+	    (:= temp (^ a))		; assigning the memory pointed to by
+					; 	temp to what is in a 
+	    (:= a (^ b))		; assigning the memory pointed to by
+					; 	a    to what is in b
+	    (:= b (^ temp)))))		; assigning the memory pointed to by
+					;	b    to what is in temp
+
+(define swap2				; typical define statement
+  (proc-by-ref (a b)			; beginning of a function that will
+					; 	return a function
+    (:= a (+ (^ a) (^ b)))		; a = a + b
+    (:= b (- (^ a) (^ b)))		; b = a - b
+    (:= a (- (^ a) (^ b)))))		; a = a - b
+
+There is no difference between those 2 functions as long as you were
+	dealing with numbers.  swap will work for any data in a box, where
+	swap2 will only work for numbers.
+
+I would prefer swap over swap2.  All things being equal, the code for the
+	first one is easier to read.  I'll take the penalty of a local variable
+	any day of the week for more literate code.
+
+Exercise 3
+
+My guess is that the actual programmer would have hope that the value of 
+	n would be unchanged.  Because we have utilized pass-by-reference
+	functionity with the (VAR n 5) call, n will be changed because x is 
+	going to point to the same memory location that n is pointing to.
+
+Exercise 4
+
+It would be an infinite loop.  You would be squaring x, then decremeting it
+	squaring, then decremeting...  Diverging.
+
+Exercise 5
+
+( define fac-by-ref
+    ( proc-by-ref (x acc)
+        ( while (> (^ x) 0)
+	        (:= acc (* (^ x) (^ acc)))
+	        (:= x (1- (^ x))))))
+
+There should be no call-by-value for the fibonacci series, 'cause we will
+	never get to see the answer 'cause we are changing local variables
+	instead of call-by-reference where we would be changing the actual
+	values.
+
+Exercise 6
+
+The same idea as ( double ( ++ x )) we are actually doubling it many more times
+	than we think.
+
+      ( begin
+      ( := ( double x ) (+ (^ ( double x ) ) (^ ( double x) )))
+      ( double x ) )))
+
+Start x = 3
+
+      ( begin
+      ( := ( double x ) (+ ( 6 (^ ( double x) )))
+      ( double x ) )))
+
+x is now 6
+
+      ( begin
+      ( := ( double x ) (+ ( 6 12 ))
+      ( double x ) )))
+
+x is now 12
+
+      ( begin
+      ( := ( double x ) 18 )
+      ( double x ) )))
+
+x is now 18
+
+      ( := ( double x ) 18 )
+
+x is now 36 and once passed back gets doubled again to 72
+
+Exercise 7
+
+A number :		it would have a reference to that number
+A list of numbers :	it would have a reference to that list
+A vector of numbers :	it would have a reference to that vector
+Function :		it would have a reference to that returned box
+A box in a box :	reference to the box
+
+Exercise 8
+
+call-by-value :		0; 3 2 1 0
+call-by-reference :	3; 0 2 1 0
+call-by-text :		3; 3 2 1 0
+
+*** Checked by Prof on 06-28-01 ***
+
+Exercise 9
+
+It would be must faster 'cause you don't have to make a copy of the huge list.
+
+It would take much less memroy 'cause you are not copying that huge list.
+
+Call-by-value-result:
+
+It would take more memory 'cause it would still make the copy.
+It would take more time 'cause it would make a local copy, and also copy
+	the modified local variable back to the callers variables.
+
+Call-by-text:
+
+In one way it would be nice, because if the argument is never actually needed
+	in the called procedure, then no work will be expended evaluating.
+	But if do use it, it will be used every time where the text is.
+
+Call-by-need:
+
+This idea is the same as the idea for call by text but will only evalute that
+	object once, so you don't get any of the weirdness. 
+
+Scheme's choice not to implement lists using call-by-value will save my 
+	application both time and memory.  This will be because it never
+	takes time to copy it, so we will be saving memory, and because 
+	it never takes the time to copy large datastructures, we save time.
+
+Call-by-value-result:
+
+I am glad that you guys did not use this type of argument passing in your
+	implementation of your lists.  This would have made for many 
+	unneccessary copying to be done.  I have a database application
+	that has over 1000 elements. If I would have using that style of
+	arguments passing to use here, it would have not only copied
+	the list on passing, but on returning also.  This is time and memory
+	that I dont' have.
+
+Exercise 10
+
+Call-by-value:
+The variable will be copied no matter what.
+It will use only the original copy.
+
+Call-by-reference:
+No, it will never be evaluated.
+Yes, it will be evaluated once.
+
+Call-by-value-result:
+Yes it will be.
+It will be copied twice, on pass, and on return, but no more.
+
+Call-by-text:
+No it won't.
+Many times.
+
+Call-by-need:
+No.
+Only once.

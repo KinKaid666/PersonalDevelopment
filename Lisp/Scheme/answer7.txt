@@ -1,0 +1,105 @@
+*** Exercise 1 ***
+
+boss( bob, john ).
+    Yes
+boss( bob, jane ), boss( bob, alice ).
+    Yes
+boss( eric, phil ); boss( eric, carol ).
+    Yes
+job( rasputin, JOB ).
+    JOB = 'vp operations' ;
+    No
+
+*** Exercise 2 ***
+
+Yes, a comma      is a logical AND and 
+     a semi-colon is a logical OR.
+
+*** Exercise 3 ***
+
+(case-sensitive #t)
+(define substitute
+    (lambda (exp env)
+	(cond
+	     [(null? env) exp]
+	     [(null? exp) exp]
+	     [(atom? exp) (if (assoc exp env)
+			      (cdr (assoc exp env))
+			      exp)]
+	     [else (cons (substitute (car exp) env)
+			 (substitute (cdr exp) env))])))
+
+*** Exercise 4 ***
+
+(define delete
+    (lambda (x l)
+	(cond 
+	    [(null? l) l]
+	    [else (if (eq? x (caar l)) 
+		      (delete x (cdr l))
+		      (cons (car l) (delete x (cdr l))))])))
+
+*** Exercise 5 ***
+
+(define occurs-in
+    (lambda (x l)
+	(cond
+	    [(null? l) #f]
+	    [(atom? (car l)) (if (eq? x (car l))
+				 #t
+				 (occurs-in x (cdr l)))]
+	    [else (or (occurs-in x (car l))
+		      (occurs-in x (cdr l)))])))
+
+*** Exercise 6 ***
+
+see "unify.ss"
+
+*** Exercise 7 ***
+
+At first you get the answer 
+
+X = [1, 2, 3, 4, 5]
+
+When you hit the semi-colon, it goes back to the last time it make
+	a decision, and when it swapped the 2 & 3. So it undoes that.
+
+X = [1, 3, 2, 4, 5]
+
+We now have a wrong answer.
+
+*** Exercise 8 ***
+
+fac(1,1) :- !.
+fac(X,Y) :-
+	X1 is X-1, 
+	fac(X1,Res),
+	Y is Res*X.
+
+*** Exercise 9 ***
+
+fib([1,1]).
+fib([Z,Y,X | Rest]) :- fib([Y,X | Rest]), Z is X+Y.
+
+*** Exercise 10 ***
+
+member(X, [X | Rest]).
+member(X, [Y | Rest]) :- member(X, Rest).
+
+rember(X, [], []).
+rember(X, [X | Xs], NewBs) :- rember(X, Xs, NewBs).
+rember(X, [C | Cs], [C | NewCs]) :- not(C is X), rember(X, Cs, NewCs).
+
+list_length([], 0).
+list_length([X | Rest], Y) :- list_length(Rest, Z), Y is 1 + Z.
+
+*** Exercise 11 ***
+
+Drinks Water = Norwegian
+Zebra Owner  = Japanese
+
+*** Exercise 12 ***
+
+nextto(X,Y,[X,Y | REST]).
+nextto(X,Y,[Y,X | REST]).
+nextto(X,Y,[_| REST]) :- nextto(X,Y,REST).

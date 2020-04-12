@@ -1,0 +1,158 @@
+Exercise 1
+
+( define notlat?
+    ( lambda ( l )
+	( cond [ ( null? l )         #f  		   ]
+	       [ ( list? ( car l ) ) #t  		   ]
+	       [ else                ( notlat? ( cdr l ) ) ] 
+	) 
+    ) 
+)
+
+Exercise 2
+
+( define list-of-same?
+    ( lambda ( foo l )
+        ( cond [ ( null? l )       #t			           ]
+	       [ ( foo ( car l ) ) ( list-of-same? foo ( cdr l ) ) ]
+	       [ else  	           #f  	        	           ] 
+        ) 
+    ) 
+)
+
+Exercise 3
+
+( define phone-number
+    ( lambda ( person phone-book )
+        ( cond [ ( null? phone-book ) 
+		     'disconnected ]
+	       [ ( and ( eq? person ( car phone-book ) )  
+		       ( even? ( length phone-book ) ) )
+	             ( car ( cdr phone-book ) ) ]
+	       [ else  
+		     ( phone-number person ( cdr phone-book ) ) ]
+	)
+    )
+)
+
+Exercise 4
+
+( define person
+    ( lambda ( number phone-book )
+        ( cond [ ( null? phone-book ) 
+		     'disconnected ]
+
+	       ; have to check for length of 1 now
+	       ; 'cause of the cadr
+	       [ ( eq? '1 ( length phone-book ) ) 
+		     'disconnected ]
+	       [ ( and ( eq? number ( cadr phone-book ) )  
+		       ( even? ( length phone-book ) ) ) 
+	             ( car phone-book ) ]
+	       [ else 
+		     ( person number ( cdr phone-book ) ) ]
+	)
+    )
+)
+
+Exercise 5
+
+( define person
+    ( lambda ( phone-number phone-book )
+        ( cond [ ( null? phone-book ) 
+		     'disconnected ]
+	       [ ( eq? phone-number ( cadar phone-book ) ) 
+	             ( caar phone-book ) ]
+	       [ else 
+		     ( person phone-number ( cdr phone-book ) ) ]
+	)
+    )
+)
+
+Exercise 6
+
+( define old->new
+    ( lambda ( l )
+	( cond [ ( null? l )
+		     ( list ) ] 
+	       [ else
+		     ( cons ( list 
+				   ( car  l ) 
+				   ( cadr l ) ) 
+			    ( old->new ( cddr l ) ) ) ] 
+	)
+    )
+) 
+
+Exercise 7
+
+( define new->old
+    ( lambda ( l )
+	( cond [ ( null? l )
+		     ( list ) ]
+	       [ else 
+		     ( cons ( caar l ) 
+			    ( cons ( cadar l ) 
+				   ( new->old ( cdr l ) ) ) ) ]
+	)
+    ) 
+)
+
+Exercise 8
+
+( define birth-date
+    ( lambda ( person book )
+	 ( cond [ ( null? book )
+		      'dont-know ]
+		[ ( eq? person ( name ( car book ) ) )
+		      ( birthday ( car book ) ) ]
+		[ else
+		      ( birth-date person ( cdr book ) ) ]
+	) 
+    )
+)
+
+Exercise 9
+
+( define vital-statistics
+    ( lambda ( question person l )
+	( cond [ ( null? l )
+		     'dont-know ]
+	       [ ( eq? person ( name ( car l ) ) )
+		     ( question ( car l ) ) ]
+	       [ else
+		     ( vital-statitics question person ( cdr l ) ) ]
+	)
+    )
+)
+
+Exercise 10
+
+( define phone-number
+    ( lambda ( person birth-date l )
+	( cond [ ( null? l )
+		     'disconnected ]
+	       [ ( and ( eq? person     ( name     ( car l ) ) )
+		       ( eq? birth-date ( birthday ( car l ) ) ) )
+		     ( number ( car l ) ) ]
+	       [ else
+		     ( phone-number person birth-date ( cdr l ) ) ]
+	)
+    )
+)
+
+Exercise 11
+
+( define phone-numbers
+    ( lambda ( person l ) 
+	( cond [ ( null? l )
+		     ( list ) ]
+	       [ ( eq? person ( name ( car l ) ) )
+		     ( cons ( number ( car l ) ) 
+			    ( phone-numbers person ( cdr l ) ) ) ]
+	       [ else
+	             ( phone-numbers person ( cdr l ) ) ]
+		     
+	)
+    )
+)

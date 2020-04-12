@@ -1,0 +1,80 @@
+Eric Ferguson
+Mike Stiles
+
+Exercise 1
+
+	1.	'42iscool' is not at atom 'cause it contains characters and 
+		not just numbers.  This can be bound and become an atom.
+
+	2.	Umm, yes and no.  '( + 1 2 )' is not an atom, but an 
+		expression, but it will evaluate to 3, which is an atom.
+		So if you say 
+			'> ( atom? '( + 1 1 ) )' 
+		it will not be an atom, but if you type 
+			'> ( atom? ( + 1 2 ) ) 
+		it will evaluate to 
+			'> ( atom? 3 )'
+		and '3' is an atom.
+
+	3.	Answered in question #2
+
+Exercise 2
+
+	1.	No '( x y ) z ' is not a list, because it is not complete
+		surrounded by parentheses.
+
+	2.	No '( x y ) z ' because 'z' is not an atom or a collection.
+
+	3.	Yes, because it is an empty S-expression.
+
+Exercise 3
+
+	1.	That expression will give you an error because it will
+		try to evalute banana.  Since banana is not bound, it will
+		return an error.
+	
+	2.	This will also give you an error because 'big' will try to be 
+		checked to see if it is a procedure.  Since it isn't bound
+		yet, this will result in an error.	
+
+	3.	'caddr' is a function that when give a S-Expression gives you
+		back the 3rd element in the S-Expression.
+		The restrictions which should be place on the arguments is that
+		the S-Express that is the argument must n elements where n >= 3.
+
+Exercise 4
+
+	1.	The function 'addProductTo42' was created with this statement.
+
+( define addProductTo42 ( lambda ( arg1 arg2 ) ( + 42 ( * arg1 arg2 ) ) ) )
+	
+	2.	Here is the function that concerts Centigrade temperatures to
+		Fahrenheit.
+
+( define CentigradeToFahrenheit 
+	 ( lambda ( tempInCentrigrade )   
+		  ( + 32 ( * tempInCentrigrade ( / 9 5 ) 
+			 ) ; multiplication
+		  ) ; addition 
+	 ) ; lambda
+) ; define
+; note, cannot figure out which way is the best way to view.
+
+	3.	A function that just returns 'peanut-butter'.
+
+( define PBandJ-J ( lambda () 'peanut-butter ) )
+
+Exercise 5
+
+( define 
+    ex5function 
+    ( lambda
+        ( argString )
+	( cond  
+	    [ ( equal? argString 'name ) 'Mike ]
+	    [ ( equal? argString 'partners ) '( Mike Eric ) ]
+	    [ ( equal? argString 'comments ) "Best language ever" ]
+	    [ else 'pasta ] 
+        ) ; cond
+    ) ; lambda
+) ; define
