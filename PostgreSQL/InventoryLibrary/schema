@@ -1,0 +1,52 @@
++---------------------+--------------+-----------+--------------+--------------+
+| inventory_owners    | data type *  | Nullable? | default      | extras **    |
++---------------------+--------------+-----------+--------------+--------------+
+| inventory_owner_id  | SERIAL       | NOT NULL  |              | I P          |
+|                     |              |           |              |              |
+| first_name          | varchar(15)  | NOT NULL  |              | M            |
+| last_name           | varchar(30)  | NOT NULL  |              | M            |
+| address1            | varchar(50)  |     NULL  |              |              |
+| address2            | varchar(50)  |     NULL  |              |              |
+| city                | varchar(20)  |     NULL  |              |              |
+| state               | char(2)      |     NULL  |              |              |
+| zip                 | varchar(10)  |     NULL  |              |              |
+| phone               | varchar(12)  |     NULL  |              |              |
+| email               | varchar(30)  |     NULL  |              |              |
+| created_by          | varchar(30)  |     NULL  | CURRENT_USER |              |
+| creation_date       | timestamp    |     NULL  | CURRENT_TIMESTAMP |         |
++---------------------+--------------+-----------+--------------+--------------+
+
++---------------------+--------------+-----------+--------------+--------------+
+| inventory_items     | data type *  | Nullable? | default      | extras **    |
++---------------------+--------------+-----------+--------------+--------------+
+| inventory_item_id   | SERIAL       | NOT NULL  |              | I P          |
+|                     |              |           |              |              |
+| title               | varchar(50)  | NOT NULL  |              | N            |
+| author              | varchar(50)  |     NULL  |              |              |
+| publisher           | varchar(50)  |     NULL  |              |              |
+| inventory_type_id   | integer      | NOT NULL  |              | F            |
+| quantity            | integer      | NOT NULL  |            1 |              |
+| inventory_owner_id  | integer      | NOT NULL  |              | F            |
+| purchase_date       | timestamp    | NOT NULL  | CURRENT_DATE |              |
+| purchase_price      | number(8,2)  | NOT NULL  |         0.00 |              |
++---------------------+--------------+-----------+--------------+--------------+
+
++---------------------+--------------+-----------+--------------+--------------+
+| inventory_types     | data type *  | Nullable? | default      | extras **    |
++---------------------+--------------+-----------+--------------+--------------+
+| inventory_type_id   | SERIAL       | NOT NULL  |              | I P          |
+|                     |              |           |              |              |
+| name                | varchar(20)  | NOT NULL  |              |              |
+| description         | varchar(80)  | NOT NULL  |              |              |
++---------------------+--------------+-----------+--------------+--------------+
+
+*	Data types based on Table 9.1 (page 108) from PostgreSQL: Intruduction
+		and Concepts.
+**	Extras
+	Identifier	Descriptions
+	=======================================================================
+	I		unique index
+	N		index
+	M		multicolumn index
+	P		primary key
+	F		foreign key

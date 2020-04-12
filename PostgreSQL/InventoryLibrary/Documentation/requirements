@@ -1,0 +1,20 @@
+Requirements
+$Id$
+
+Abstract
+
+This document specifies the purpose, use cases, design principles, and base 
+requirements for an Inventory Library.
+
+I. Overview
+
+
+
+II. Purpose
+
+The purpose of the Inventory Library (IL) is to be able to maintain many items
+items, with multiple owners, in an orderly fashion.
+
+The goal of the IL is to allow multiple owners, be it members of the household
+or friends (inventory borrowers in our case).
+
