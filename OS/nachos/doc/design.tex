@@ -1,0 +1,21 @@
+\documentclass[final]{report}
+\includeonly{filesys_design}
+
+\setcounter{tocdepth}{1}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{NachOS Based OS Design}
+\author{Trevor Clarke\\
+	Eric Eells\\
+	Eric Ferguson\\
+	Daniel Westgate}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \include{multiprogramming_design}
+  \newpage
+  \include{virtualmemory_design}
+  \newpage
+  \include{filesys_design}
+\end{document}

@@ -1,0 +1,341 @@
+  \chapter{User Processes \& Multi-programming}
+  \section{Introduction}
+    This document explains the modifications made to NachOS to implement user
+    processes and multi-programming features.
+  
+  \section{Nice Design Features}
+    \begin{itemize}
+      \item The exit path, although quite complex, handles the cleanup of fairly complex
+	object interactions.
+      
+      \item Our stack allocation routines are easy to modify to accommodate dynamic
+	stacks.
+      
+      \item \code{ThreadExit()} is called by all threads explicitly. This can be
+	implemented with wrappers to \code{Fork()}. This flexibility allow for changes in
+	the userland \code{Fork()} semantics without changing the kernel.
+    \end{itemize}
+
+  \section{Known Problems}
+  \label{xref:knownproblems}
+    \begin{itemize}
+      \item Modifications to the \code{Thread} class can cause problems with
+	\code{SWITCH()}. The current system is stable in this regard, but may not work if
+	more is added to this class.
+      
+      \item The exit path is overly complex and utilizes a kernel thread to kill user
+	threads. This sometimes causes synchronization issues, primarily if \code{Fork()}
+	is called immediately before \code{Exit()}. A temporarily solution is to place a
+	\code{for() Yield();} loop that yields some number of times (found by trial and
+	error) before exiting. This give the \code{Fork()} enough time to establish a new
+	thread.
+      
+      \item Many of the user programs are not bulletproof. The shell can not handle
+	unnecessary whitespace.
+	  
+      \item There is an over-restriction on many of the \code{Process} data structures
+	such as a maximum number of arguments.
+      
+      \item \code{ThreadExit()} must be called explicitly by all threads.
+    \end{itemize}
+  
+  \section{Conventions}
+    \begin{itemize}
+      \item Kernel functions returning an integer error code indicate success
+      with a zero (0) and failure with a function specific non-zero value.
+
+      \item Kernel functions returning a pointer indicate failure by returning
+      a \code{NULL} pointer. Actual error information is provided in a function
+      specific manner, typically through use of \code{DEBUG()} statements.
+
+      \item When a process has no more threads that are \code{READY-TO-RUN} or
+      \code{BLOCKED}, the associated process is destroyed and its resources reclaimed.
+
+      \item When a process is killed via an \code{Exit()} system call, all of it's
+      threads are killed.
+    \end{itemize}
+  
+  \section{Time Slicing \& Thread Overview}
+    User threads are implemented using NachOS kernel threads. Therefore, most
+    scheduling is handle by the existing mechanisms. The NachOS ``random
+    yield'' feature is modified to support preemptive task switching. A machine
+    timer is set to expire on a regular basis. The currently running thread's
+    \code{Quantum} is decremented and a \code{Yield()} is forced when this \code{Quantum}
+    reaches zero.\\
+
+    User threads are kernel threads that are associated with a process, and thus an
+    address space. One of the flaws in our design was to modify the \code{Thread} class
+    instead of making a new class containing the \code{Thread} class. This may not be an
+    OOP flaw but the \code{Thread} class is very touchy as to the size and positioning of
+    member variables. The \code{SWITCH()} function is an assembly routine and needs to
+    know exactly where stack information is located within the data structure. If we
+    reorder some of the data we added to this class, nachos immediately core dumps when
+    the first task switch is attempted. We found a configuration that seems to work but
+    if we could do things over, we would change this portion of our design.\\
+
+    We have added a thread ID, associated process ID, associated process pointer, and
+    composite ID to the \code{Thread} class. The composite ID consists of a TID in bits
+    0--7 and a PID in bits 8--15. This uniquely identifies the thread within the system
+    and is primarily used as a user interface aid allowing a user to specify a thread
+    using one number instead of two.\\
+
+    The \code{Thread::join()} function allows a thread to wait for a process to finish. A
+    condition variable in class \code{Process} is used to facilitate joining. See section
+    \ref{xref:proc} for more information. We modified the \code{Thread::Finish()}
+    routine. Previously, only the currently active thread can be finished. A global
+    pointer is set to point to the current thread, then the thread sleeps, yielding the
+    process. When the context switch occurs, the thread is unscheduled and destroyed. We
+    needed the ability to finish an arbitrary thread so we changed \code{Finish()}. The
+    thread being finished is set as the thread to be destroyed. If this thread is also
+    the current thread, \code{Sleep()} is called. This is identical to the original
+    implementation. If the thread being finished is not currently running, the
+    \code{Finish()} function returns and the thread is destroy when the next context
+    switch occurs. Only one thread can be destroyed at a time. We must ensure that the
+    pending thread destruction is resolved before calling \code{Finish()} on another
+    thread. This can be fixed with a mutex preventing access to the
+    \code{threadToBeDestroyed} global variable if a destruction is pending; or the global
+    \code{threadToBeDestroyed} could be replaced by a list of threads.\\
+  
+  \section{Memory Management}
+    A paging memory system is used because there are many utilities supplied by NachOS
+    which are conducive to paging, including hardware page table translation. When a new
+    process is created it is allocated pages of memory for its code that will be set to
+    read only. This is only possible if the code and data segments begin on page
+    boundaries. The MIPS compiler suite used is set to align these sections on
+    \textbf{code{0x80}} byte boundaries which is the currently size of a page in our
+    system.\\
+
+    Allocation of memory for a process is static. When a program is loaded, the required
+    amount of memory is determined and an appropriate number of pages are allocated. A
+    global \code{BitMap} keeps track of what pages of memory have been allocated.
+    Additional space for thread stacks is also reserved. This means that there is a
+    limit to the number of threads that can be active in a process at one time.
+    Currently, the maximum is 4 threads. A \code{BitMap} in class \code{AddrSpace} keeps
+    track of which pre-allocated stacks are in use. When a thread finishes, it's stack
+    space becomes available for a new thread. Since the stacks are at the end of the
+    process' address space, and an address space can utilize non-contiguous pages of
+    memory, it is possible to dynamically allocate stack space. A modification to the
+    \code{allocStack()} and \code{freeStack()} methods of \code{AddrSpace} is necessary
+    to implement dynamic stacks.\\
+
+    Functions to allocate physical memory and free allocated memory for an address space
+    have been added. Also, two functions that copy data from user space to kernel space
+    and back have been added. These are essentially the same as the \code{ReadMem()},
+    \code{WriteMem()}, and \code{Translate()} functions in the MIPS simulator. The
+    \code{copyArgs()} function places \code{Process} arguments on the specified thread
+    stack. This is used to pass \code{Exec()} arguments to the initial thread of a
+    process. Since the arguments are placed on the stack and the stack pointer is updated
+    to reflect this, the initial thread of a process may have less stack space than other
+    threads. When the thread is finished using the arguments, they may be poppedd off the
+    stack to regain the lost space. See section \ref{xref:exec} for more
+    information regarding arguments. The \code{vmstat()} function returns information
+    about memory allocation and stack allocation. It will be used to implement a
+    \code{vmstat()} system call during the next phase of the project. It is currently
+    unused.\\
+
+    The \code{AddrSpace} constructor needed modification to support paging. The default
+    implementation assumed all virtual page numbers pointed to the equivalent physical
+    page number. This limits you to one user process. When the page table is being
+    initialized, the \code{allocPhysMemPage()} method is used to assign a physical memory
+    page to a virtual memory page. Next, the newly allocated memory is zeroed. Instead of
+    calling \code{bzero()} on the physical memory, an appropriately sized array is zeroed,
+    then it is copied to the new user space with the \code{kernToUser()} function. An
+    oversight that eluded us for quite some time involved the loading of the executable.
+    We did not remember to rewrite this so that the data is loaded utilizing the page
+    table translations so when a second process was exec'd, the data for that process
+    overwrote the data for process zero. Now, the data is loaded into a temporary char
+    array, then copied to user space with the \code{kernToUser()} method.\\
+  
+  \section{Process Class}
+  \label{xref:proc}
+    The \code{Process} class contains variables for storing process information as well
+    as functions for manipulating these values. There are some process relevant constants
+    defined as well.
+    \begin{description}
+      \item[MAX\_CHILD\_PROCS] Maximum number of active child processes that a process can
+	have. This is an artificial restriction placed on a process due to memory
+	constraints. This will probably be removed when virtual memory is implemented.
+      \item[MAX\_FILE\_HANDLES] Maximum open files a process can have. This includes the
+	two console I/O handles. This is also an artificial constraint. It is not
+	strictly necessary right now but implements a certain level of security
+	protection. For example, a process can not execute code to continuously open
+	files and cause system overutilization.
+      \item[MAX\_THREADS] This limits the number of active threads a process may have.
+	This is used by \code{AddrSpace} to statically allocate stack space for threads.
+	This will be unneeded if dynamic stack allocation is implemented.
+      \item[MAX\_JOINS] This is another strictly unnecessary constraint that provides
+	a reasonable limitation of the number of threads that can \code{Join()} on a
+	process.
+      \item[MAX\_ARGS] This is the maximum number of arguments that can be passed to
+	\code{Exec()}. This is also a precautionary measure.
+      \item[MAX\_ARG\_LENGTH] This is the maximum length of a single argument. See section
+	\ref{xref:exec} for more information.
+    \end{description}
+
+    A \code{Process} contains a condition variable used for joining threads to processes.
+    A thread requesting a \code{Join()} to the \code{Process} waits on the condition
+    variable. When the \code{Process} exits, the condition variable is \code{Broadcast}
+    releasing all threads joined.\\
+
+    A \code{Process} also contains a list of threads, children, and file handles. These
+    are dynamic \code{List}s. A \code{Process} can \code{exit()}, manage the above lists,
+    open files, close file handles, \code{read()} and \code{write()} to file handles.
+    Most of the \code{Process} class is self explanatory. The exit path is discussed in
+    section \ref{xref:exitpath}.
+  
+  \section{ProcessManager Class}
+    The \code{ProcessManager} is a singleton class that handles the interactions between
+    \code{Process}' and the management of \code{Process}'. It contains a process table
+    and the value of the next PID as well as accessors and mutators. The
+    \code{getProcCount()}, \code{getProcInfo()}, \code{exit()}, \code{threadExit()},
+    \code{exec()}, \code{join()}, and \code{fork()} system calls are implemented in this
+    class.\\
+
+    \code{ProcessManager} also contains the \code{initThread()} and \code{threadKiller()}
+    static functions used to start and end threads. The \code{initThread()} function
+    takes an \code{AddrSpace} pointer for the thread to begin. The \code{AddrSpace} is
+    restored and the \code{Machine::Run()} function is called. This reentrant function
+    begins execution of the thread's user code. The \code{PC} and \code{SP} must have
+    been set before \code{Fork()} is called. The \code{threadKiller()} function is
+    described in section \ref{xref:exitpath}.
+
+  \section{SConsole}
+  \label{xref:sconsole}
+    The \code{SConsole} class allows for synchronous access to console I/O. It
+    instantiates a \code{Console} and provides condition variable synchronization to the
+    \code{Console} on the \code{read()}/\code{write()} level.
+
+  \section{Other Class Changes}
+    The following changes were made to existing classes and were not discussed in one of
+    the above sections.
+
+    \subsection{List}
+      We added accessors for the first and last item of a \code{List}. This simplifies
+      iteration.
+    \subsection{BitMap}
+      We added an accessor for the \code{numBits} member variable. This is used to obtain
+      total memory page and total thread stack information for the
+      \code{AddrSpace::vmstat()} function.
+
+  \section{System Calls}
+    The following section describes implementation details for the system calls
+    implemented.
+
+    \subsection{Halt}
+      This system call executes \code{interrupt->Halt()} stopping the NachOS system.
+
+    \subsection{Exit}
+      This begins the exit path on the current process. See section \ref{xref:exitpath}
+      for more information.
+
+    \subsection{Exec}
+    \label{xref:exec}
+      The \code{Exec} system call establishes a new \code{Process} object and spawns the
+      initial \code{Thread} for that \code{Process}. Arguments are passed via a modified
+      \code{argc}/\code{argv} method. \code{argv} is a \code{char *} containing all of
+      the arguments to the new \code{Process}' \code{main()}. Arguments are a fixed
+      length within \code{argv} and are \code{NULL} padded. The length of \code{argv} can
+      be calculated with $\code{argc} * \code{MAX\_ARG\_LENGTH}$. This approach was
+      used, instead of traditional \code{char *argv[]} semantics, since it is very easy
+      to determine the length of \code{argv}. If traditional semantics were used,
+      multiple \code{userToKern()} calls would be required to locate the end of each
+      argument string. Our approach allows for a single \code{userToKern()} call, and
+      later a single \code{kernToUser()} call (for transferring \code{argv} to the new
+      \code{Process}).
+
+    \subsection{Join}
+      The \code{Join()} system call is implemented in the \code{ProcessManager} class.
+
+    \subsection{Create, Open \& Close}
+      These system calls are implemented in the stub filesystem.
+
+    \subsection{Read \& Write}
+      These system calls are implemented in the \code{SConsole} class, described in
+      section \ref{xref:sconsole}.
+
+    \subsection{Fork}
+      This starts a new thread in the current process.
+
+    \subsection{Yield}
+      This calls \code{Yield()} on the currently running thread.
+
+    \subsection{ThreadExit}
+      This causes the currently running thread to exit. See section \ref{xref:exitpath}
+      for more information on the exit path.
+
+    \subsection{Kill}
+      This system call kills a \code{Process} identified by its PID. This was a call we
+      added but did not need to use so it is not fully tested.
+
+    \subsection{ProcInfo}
+      This returns information about running processes including process name, PID,
+      parent PID, number of threads, number of joins, and number of children. It is used
+      to implement the \code{ps} user program. Future versions may include more specific
+      thread information such as thread IDs.
+
+    \subsection{GetProcCount}
+      This returns the number of running processes.
+
+    \subsection{VMStat}
+      We did not finish this system call. It's primary use will be in the virtual memory
+      section of NachOS so we did not bother completing this yet.
+
+  \section{The Exit Path}
+  \label{xref:exitpath}
+    The exit path is a series of serial and parallel steps that cause threads and
+    processes to exit. Different system calls and events may enter the path at various
+    points. This section will describe the path from the point of view of the
+    \code{Exit()} system call. This system call enters the path at the beginning so it
+    provides a complete description.\\
+
+    First, the \code{ProcessManager} removes the \code{Process} information from its data
+    structures. If the process has a parent, the parent is notified to remove the process
+    from its child list. If this is the last process, the system is halted.\\
+
+    Next, \code{Process::exit} is called. Each thread is killed by the
+    \code{ProcessManager}. Then, the joiners condition variable is \code{Broadcast}
+    released.\\
+
+    The \code{ProcessManager::threadKill} function unschedules the thread to be killed,
+    calls \code{Finish()} on that thread, then \code{Yields()} to force a
+    \code{SWITCH()}. This cleans up the thread data structures.\\
+
+    This path is executed within a new kernel thread. The major problem with this is
+    synchronization. Occasionally a data structure is deleted and then accessed. This is
+    a rare occurrence and we have been unable to track it down.
+
+  \section{Userland Programs}
+    \subsection{cat}
+      The \code{cat} program functions like the UNIX equivalent. A filename is given as
+      an argument and the contents of that file are sent to the console.
+    
+    \subsection{echo}
+      The \code{echo} program is used to test argument passing. It's arguments are
+      printed to the console.
+    
+    \subsection{fork}
+      This program tests the \code{Fork()} system call. It prints a string, forks a new
+      thread, and prints a second string. The new thread prints two strings. The
+      \code{for()} loop in this program prevents a known problem from occurring, see
+      section \ref{xref:knownproblems} for information on the \code{Fork/Exit} problem.
+    
+    \subsection{halt}
+      This program halts the system.
+    
+    \subsection{procCount \& ps}
+      These programs test the \code{GetProcCount()} and \code{GetProcInfo()} system calls.
+    
+    \subsection{touch}
+      This program \code{Create}s a new file. This file will be empty.
+    
+    \subsection{shell}
+      Our shell is a simple \code{Read}, \code{Parse}, \code{Exec} loop. A prompt is
+      printed and the system waits for console input. Parsing splits up the resulting
+      command line using \emph{space} as a delimiter. If the last ``argument'' is an
+      ampersand (\&), then the resulting process is placed in the background. If a
+      process is to be run in the foreground, after \code{Exec()} is called, \code{Join}
+      is called on the returned PID. The shell can not deal with unnecessary white space.
+
+    \subsection{others}
+      There are more programs we used for testing various aspects of the system and for
+      reliably recreating bugs during development.
