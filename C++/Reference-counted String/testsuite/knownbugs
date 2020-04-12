@@ -1,0 +1,2 @@
+no cow() in char& CString::operator[]( int )
+    solution - add it, but then even if no write occurs a copy has been made

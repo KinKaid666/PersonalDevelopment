@@ -1,0 +1,31 @@
+LIBRARY=	libcstring.so
+OBJECTS=	itoa.o cstring.o 
+CC=		g++
+CCFLAGS=	-g 
+LINK=		g++
+LINKFLAGS=	-shared
+RM=		rm
+
+# Targets
+all:		$(LIBRARY)
+
+clean:
+	-$(RM) $(OBJECTS)
+
+realclean:	clean
+	-$(RM) $(LIBRARY)
+
+$(LIBRARY):	$(OBJECTS)
+	$(LINK) $(LINKFLAGS) -o $@ $(OBJECTS)
+
+# Dependencies
+
+$(LIBRARY):	$(OBJECTS)
+cstring.o:	cstring.h reference.h itoa.h
+itoa.o:		itoa.h
+
+# Suffix Rules
+.SUFFIXES:
+.SUFFIXES: 	.C .o
+.C.o:
+	$(CC) $(CCFLAGS) -c $<

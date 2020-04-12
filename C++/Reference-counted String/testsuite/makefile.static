@@ -1,0 +1,36 @@
+# File:		$Id: makefile.static,v 1.2 2002/08/05 17:54:31 etf2954 Exp $
+
+TARGET=		cstring_test
+CC=		g++
+CCFLAGS=	-g 
+INCLUDEDIRS=	-I..
+LINK=		g++
+LINKFLAGS=	
+LINKDIRS=	-L.
+LIBS=		../libcstring.a
+RM=		rm
+
+# Targets
+all:		$(TARGET) 
+
+clean:
+	-$(RM) $(TARGET).o $(OBJECTS)
+
+realclean:	clean
+	-$(RM) $(TARGET)
+	-$(RM) $(TARGET).core
+
+$(TARGET):	$(TARGET).o $(LIBS)
+	$(LINK) $(LINKFLAGS) $(LINKDIRS) -o $@ $@.o $(LIBS)
+
+# Dependencies
+$(TARGET):	$(LIBS)
+$(LIBS):
+	(cd .. ; make)
+
+
+# Suffix Rules
+.SUFFIXES:
+.SUFFIXES: 	.C .o
+.C.o:
+	$(CC) $(CCFLAGS) $(INCLUDEDIRS) -c $<
