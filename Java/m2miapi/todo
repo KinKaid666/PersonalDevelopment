@@ -1,0 +1,45 @@
+I. Porting m2mi -> jdk 1.3.1
+
+    A. Missing classes
+
+	1. Inet Addresses
+	    a. java.net.InetSocketAddress
+		i. Solution(s)
+		    - use java.net.InetAddress
+	    b. java.net.SocketAddress
+		i. Solution(s)
+		    - use java.net.InetAddress
+
+	2. Exceptions
+	    a. java.net.SocketTimeoutException
+		i. Solution(s)
+		    - use another exception
+
+	3. Collections
+	    a. java.util.LinkedHashMap
+		i. Solution(s)
+		    - write class 
+		    - use different collection
+
+    B. Unresolve Symbols
+
+	1. super
+	    - call to throw a except to base class
+	    a. class SynthesisException
+		i. Solution(s)
+		    - research ?
+
+	2. java.lang.Exception.initCause
+	    a. class MultihandleTransport.java
+		i. Solution(s)
+		    - research ?
+
+	3. javax.swing.JTextField.requestFocusInWindow
+	    a. class ChatFrame
+		i. Solution(s)
+		    - research ?
+
+Do something with uncaught exceptions in following class
+    - edu.rit.m2mi.SynthesisException
+    - edu.rit.m2mi.InvalidMethodException
+    - edu.rit.m2mi.InvocationException

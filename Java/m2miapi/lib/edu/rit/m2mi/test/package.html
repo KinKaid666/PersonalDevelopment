@@ -1,0 +1,343 @@
+<HTML>
+<HEAD>
+<TITLE>Package edu.rit.m2mi.test</TITLE>
+</HEAD>
+<BODY>
+
+Package edu.rit.m2mi.test
+contains test and demonstration programs
+for distributed applications
+based on Many-to-Many Invocation (M2MI).
+There are three:
+<A HREF="#chatdemo">Chat Demo</A>,
+<A HREF="#pingpong">Ping-Pong Demo</A>,
+and <A HREF="#m2miwatch">M2MIWatch</A>.
+<P>
+<B>M2MI Library Version 02-Jul-2002</B>
+
+<P>
+<HR>
+<A NAME="chatdemo"><H2>1. Chat Demo</H2></A>
+
+<P>
+The Chat Demo
+(class <A HREF="ChatDemo.html">ChatDemo</A>)
+is a rudimentary chat application using M2MI.
+
+<P>
+<H3>1.1. Running the M2MP Router</H3>
+
+<P>
+Before you can run the Chat Demo itself,
+you must run the M2MP Router
+(class <A HREF="../../m2mp/ip/M2MPRouter.html">edu.rit.m2mp.ip.M2MPRouter</A>)
+in a separate process.
+Type this command:
+<P>
+<TT>java edu.rit.m2mp.ip.M2MPRouter</TT>
+<P>
+If you would like the M2MP Router to tell you what it's doing,
+type this command instead:
+<P>
+<TT>java edu.rit.m2mp.ip.M2MPRouter -v</TT>
+
+<P>
+<H3>1.2. Running the Chat Demo</H3>
+
+<P>
+To run one instance of the Chat Demo,
+type this command,
+supplying the desired user name:
+<P>
+<TT>java edu.rit.m2mi.test.ChatDemo <I>username</I></TT>
+<P>
+It will display a UI like this:
+<P>
+<CENTER>
+<IMG SRC="doc-files/chatdemo.png">
+</CENTER>
+<P>
+To run several instances of the Chat Demo,
+execute the above command in several separate processes,
+giving a different user name each time.
+All these instances constitute the "chat session."
+<P>
+To send a message to the chat session,
+type the message in the text field at the bottom of the UI
+and click the "Send" button (or hit RETURN).
+The message will appear in all the Chat Demo instances
+that are running.
+
+<P>
+<H3>1.3. Under the Hood</H3>
+
+<P>
+The Chat Demo program exports a chat object
+(class <A HREF="ChatObject.html">ChatObject</A>)
+that implements interface <A HREF="Chat.html">Chat</A>,
+which is:
+<PRE>
+    public interface Chat {
+        public void putLine (String line);
+    }</PRE>
+<P>
+When the user types a line of text in the UI,
+the chat object broadcasts the line to all the exported chat objects
+by calling <TT>putLine()</TT> on an omnihandle for interface Chat.
+The M2MI layer then performs remote method invocations
+on all the chat objects that are out there
+in all the processes.
+The invocations are transported between processes
+using Many-to-Many Protocol (M2MP) messages.
+(See package <A HREF="../../m2mp/package-summary.html">edu.rit.m2mp</A>.)
+When each chat object receives a <TT>putLine()</TT> invocation,
+it displays the line of text in the chat log in its UI.
+In this way the line of text appears
+in all the Chat Demo programs that are running.
+<P>
+Notice how the M2MI-based chat application
+differs from typical distributed applications.
+There is no chat server.
+The Chat Demo programs do not have to connect to a server.
+The Chat Demo programs do not have to connect to each other.
+Consequently, the Chat Demo programs
+do not need to know any network addresses
+(of servers or other clients).
+M2MI-based applications need no network configuration or administration,
+making M2MI-based applications easy to develop and deploy,
+especially in an ad hoc network.
+<P>
+Notice too how the M2MI-based chat application's
+remote method invocations
+differ from remote method invocations using Java RMI.
+There is no RMI compiler (<TT>rmic</TT>),
+no proxy classes,
+and no codebase server.
+Instead, M2MI synthesizes its own proxy classes
+internally as needed.
+M2MI-based applications need none of Java RMI's ancillary apparatus,
+again making M2MI-based applications easy to develop and deploy,
+especially in an ad hoc network.
+
+<P>
+<H3>1.4. Routing Issues</H3>
+
+<P>
+The Many-to-Many Protocol broadcasts messages
+to all processes
+by sending UDP datagrams
+to port 5678
+on the "localhost" IP address,
+127.0.0.1.
+(See class <A HREF="../../m2mp/ip/M2MPRouterChannel.html">edu.rit.m2mp.ip.M2MPRouterChannel</A>.)
+The M2MP Router receives each message
+and sends a copy back
+to each process with an M2MP layer.
+For this to work properly,
+the operating system's IP routing table
+must be configured to route IP address 127.0.0.1
+to the "loopback" network interface.
+Consult your operating system documentation
+to discover how to configure the loopback interface
+and the IP routing table.
+<P>
+For example, here is the output
+of the <TT>netstat</TT> program
+for a properly-configured IP routing table
+on a Linux system:
+<P>
+<FONT SIZE="-1"><PRE>$ netstat -rn
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+. . .
+127.0.0.0       0.0.0.0         255.0.0.0       U        40 0          0 lo</PRE></FONT>
+
+<P>
+<H3>1.4. Two Hosts</H3>
+
+<P>
+You can also run instances of the Chat Demo
+on separate host machines.
+If you do that, though,
+you must configure the M2MP Router
+to broadcast M2MP messages between the hosts.
+To broadcast between two hosts
+named <TT>"host1"</TT> and <TT>"host2"</TT>
+(substitute the actual host names or IP addresses),
+execute this command
+in a separate process on <TT>host1</TT>:
+<P>
+<TT>java edu.rit.m2mp.ip.M2MPRouter -s host2 -r host1</TT>
+<P>
+And execute this command in a separate process on <TT>host2</TT>:
+<P>
+<TT>java edu.rit.m2mp.ip.M2MPRouter -s host1 -r host2</TT>
+<P>
+The command line arguments are the address to send messages to
+(the other host's address)
+and the address to receive messages from
+(this host's own address).
+Now messages sent to the chat session
+will appear in all Chat Demo instances
+running on both hosts.
+<P>
+Under the hood,
+the M2MP Router receives each M2MP datagram
+from the local host
+and forwards the datagram to the other host's IP address and port.
+Simultaneously,
+the M2MP Router receives each M2MP datagram
+which the other host sends
+to its own host's IP address and port
+and forwards the datagram to the local host.
+This establishes a "tunnel" between the two hosts,
+such that all M2MI invocations generated on the one host
+are broadcast on the other host
+and vice versa.
+
+<P>
+<H3>1.5. More Than Two Hosts</H3>
+
+<P>
+To broadcast M2MP messages between two or more hosts
+using IP multicasting,
+execute this command in a separate process on each host:
+<P>
+<TT>java edu.rit.m2mp.ip.M2MPRouter -m 239.255.0.1</TT>
+<P>
+The command line argument is
+a multicast IP address
+to send messages to
+and receive messages from.
+The multicast IP address must be
+in the range 224.0.0.0 to 239.255.255.255
+(pick an unused one).
+Now messages sent to the chat session
+will appear in all Chat Demo instances
+running on all the hosts.
+<P>
+Under the hood,
+the M2MP Router operates exactly as before,
+except it sends datagrams to
+and receives datagrams from
+the multicast IP address.
+M2MI invocations generated on one host in that multicast group
+are broadcast to all hosts in the multicast group.
+<P>
+For this to work properly,
+each host's network interface must have multicasting enabled,
+and each host's IP routing table must have a multicast route
+to that network interface.
+Consult your operating system documentation
+to discover how to configure the network interface
+and the IP routing table for multicast.
+<P>
+For example, here is the output
+of the <TT>netstat</TT> program
+for a properly-configured IP routing table
+on a Linux system:
+<P>
+<FONT SIZE="-1"><PRE>$ netstat -rn
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+. . .
+224.0.0.0       0.0.0.0         240.0.0.0       U        40 0          0 eth0</PRE></FONT>
+
+<P>
+<HR>
+<A NAME="pingpong"><H2>2. Ping-Pong Demo</H2></A>
+
+<P>
+To run the Ping-Pong Demo,
+start the M2MP Router in its own process as above.
+Then execute this command
+(class <A HREF="Ping.html">Ping</A>)
+in one process:
+<P>
+<TT>java edu.rit.m2mi.test.Ping</TT>
+<P>
+Execute this command
+(class <A HREF="Pong.html">Pong</A>)
+in a second process:
+<P>
+<TT>java edu.rit.m2mi.test.Pong</TT>
+<P>
+Finally, execute this command
+(class <A HREF="StartPingPong.html">StartPingPong</A>)
+in a third process:
+<P>
+<TT>java edu.rit.m2mi.test.StartPingPong</TT>
+<P>
+The Ping program will print <TT>Ping 1</TT>,
+then the Pong program will print <TT>Pong 2</TT>,
+then the Ping program will print <TT>Ping 3</TT>,
+then the Pong program will print <TT>Pong 4</TT>,
+and so on.
+<P>
+Under the hood,
+all three programs are invoking methods
+on an omnihandle for interface <A HREF="PingPong.html">PingPong</A>.
+The Ping and Pong programs
+each export an object
+that implements interface PingPong.
+The StartPingPong program calls <TT>ping(1)</TT> and exits.
+Executing the <TT>ping()</TT> method,
+the Ping object prints a message,
+waits one second,
+and calls <TT>pong(2)</TT>.
+Executing the <TT>pong()</TT> method,
+the Pong object prints a message,
+waits one second,
+and calls <TT>ping(3)</TT>.
+And so on forever.
+<P>
+You can also run the Ping-Pong Demo programs
+on different hosts,
+as long as you also run an M2MP Router process
+on each host
+that broadcasts messages between the hosts
+as described above.
+
+<P>
+<HR>
+<A NAME="m2miwatch"><H2>3. M2MIWatch</H2></A>
+
+<P>
+To run the M2MIWatch program
+(class <A HREF="M2MIWatch.html">M2MIWatch</A>),
+start the M2MP Router in its own process as above,
+then execute this command in a separate process:
+<P>
+<TT>java edu.rit.m2mi.test.M2MIWatch</TT>
+<P>
+The M2MIWatch program listens for M2MP messages
+being sent on the local host
+that contain M2MI invocations.
+For each M2MI invocation,
+the M2MIWatch program prints one line on the standard output
+containing these items (separated by commas):
+<UL>
+<LI>
+Magic number for M2MI messages, 1295142217 (0x4D324D49, or "M2MI" in ASCII).
+<LI>
+Hash code each M2MI layer uses to decide whether to process the message.
+<LI>
+Exported object identifier (EOID).
+<LI>
+Target interface name.
+<LI>
+Target method name.
+<LI>
+Target method descriptor.
+<LI>
+Number of bytes of the serialized method arguments.
+<LI>
+Bytes of the serialized method arguments, if any.
+</UL>
+<P>
+Use the M2MIWatch program
+to verify that M2MI invocations
+are in fact being sent.
+
+</BODY>
+</HTML>

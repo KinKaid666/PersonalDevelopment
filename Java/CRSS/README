@@ -1,0 +1,23 @@
+Type 'run' to run the project.
+
+A test database file is 'FINAL.crss'
+
+A test room list is 	'list.room'
+A test section list is	'list.section'
+
+We met all of our minimal and advance requirements.
+
+	1.) Modify Room
+	2.) Modify Section
+	3.) Copy Section
+	4.) Edit Room
+	5.) Different sorts
+	6.) Redo
+	7.) Add Room from file
+	8.) Add Section from file
+	9.) Filtering rooms
+	10.) Section attributes
+	11.) Room attributes
+	12.) Toolbar
+	13.) Exporting room list
+	14.) Exporting section list

@@ -1,0 +1,370 @@
+\documentclass[12pt]{article}
+\setlength{\topmargin}{0in}
+\setlength{\headheight}{1in}
+\setlength{\headsep}{0in}
+
+\setlength{\textheight}{8.0 true in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\setlength{\textwidth}{6.0 true in}
+
+\title{Security in ad Hoc Networking \\
+	       Team D\\
+       Secure Group Communication - Design}
+
+\author{
+    Jeremy Balmos \\
+    (\texttt{jcb7565@cs.rit.edu})\\[1ex]
+\and
+    Shawn Chasse \\
+    (\texttt{smc0857@cs.rit.edu})\\[1ex]
+\and
+    Jeremy Dahlgren \\
+    (\texttt{jad0883@cs.rit.edu})\\[1ex]
+\and
+    Eric Ferguson \\
+    (\texttt{etf2954@cs.rit.edu})\\[1ex]
+}
+
+
+% Commands
+\newcommand{\code}[1]{\texttt{#1}}
+
+\begin{document}
+  \maketitle
+  \newpage
+  \tableofcontents
+  \newpage
+    \section{Introduction}
+    \label{xref:introduction}
+	This paper introduces a implementation of a protocol suggested by
+	Adrian Perrig in his \textit{Efficient Collaborative Key Management 
+	    Protocols For Secure Autonomous Group Communication} paper.
+
+     \subsection{Adrian Perrig Communication Paper Review}
+     \label{xfer:adrian_perrig_communication_paper_review}
+     	Adrian Perrig presented a paper on \textit{Efficient Collaborative
+    	Key Management Protocols for Secure Autonomous Group Communication}. 
+	In this paper he established three protocols for secure group 
+	communication over any type of network media.\\
+	\\
+	Perrig described five basic properties that any \textit{group key 
+	agreement protocol} (GKAP) should have.  Any GKAP should be 
+	contributory, have implicit key authentication, have key integrity, 
+	provide key confirmation, and provide key independence.  These
+	properties provide perfect backward and forward secrecy.  For more
+	information about these properties refer to the background section
+	in his paper.\\
+	\\
+	Before presenting the protocols, Perrig stated several assumptions that
+	the protocols will function under.  One assumption is that after a 
+	group member has been authenticated it will not be malicious in any
+	way.  Another assumption is that each group member trusts a
+	Certificate Authority or Key Authentication Center being used.  A final
+	assumption is that any group member fails by halting.\\
+	\\
+	The first protocol presented does have any type of user 
+	authentication.  A binary tree is used to give structure to the group.
+	Each group member is located at a leaf in the binary tree.  A group
+	key is established by using a key generation procedure based on 
+	Diffie-Hellman key agreement between nodes.  Keys for intermediate
+	nodes are established by randomly selecting a node from the left 
+	subtree and right subtree to execute the Diffie-Hellman key generation 
+	procedure.  The key established at the root node is the group key that
+	will be used for secure communication.  Since this protocol uses 
+	Diffie-Hellman to generate a key, it is vulnerable to a man in the 
+	middle attack.  Even though this protocol lacked group authentication, 
+	it is still usable as a base for the other protocols to build upon.\\
+        \\
+	Next he presented a protocol, which incorporates user authentication.
+	This authentication is generated through a trusted third party or a 
+	certificate agency. The authentication is an authenticated 
+	Diffie-Hellman scheme using digital signatures and a public key 
+	infrastructure. The author went on to note that there is a 
+	disadvantage to using this type of authentication. First, "... for each
+	key agreement, the certificates need to be exchanged, which consumes
+	bandwidth because of the large size of certificates." Furthermore 
+	"... the signature of the PKI [public key infrastructure] needs to be 
+	verified, which is computationally expensive." Based on this 
+	disadvantage, the author decided to present a third and final 
+	protocol.\\
+	\\
+	The third protocol provided in this paper is based on \textit{Gunther's
+	identity based key agreement protocol}.  Gunther's authentication 
+	strategy uses a key authentication center to distribute private and
+	public information for each group member which is used in member
+	authentication prior to any key agreement procedure.  
+	The workings of Gunther's protocol can be found in Perrig's paper 
+	and do not need to be repeated here.\\
+	\\
+	Our implementation of secure group communication is based on Perrig's 
+	third proposed protocol.  The exact key agreement was changed because 
+	of mathematical reasons.  We ended up using a Diffie-Hellman based 
+	key agreement procedure which follows Perrig's algorithm for 
+	generating the key up the binary tree. The inner workings of our 
+	protocol implementation are described in the proceeding paper. Please 
+	reference the attached copy of Adrian Perrig's paper if there are any 
+	further questions about his protocols.
+	\\
+	
+    \section{Design Notes}
+    \label{xfer:design_notes}
+     \begin{itemize}
+       \item	A unique member in the group is called the \textit{Group 
+		Controller (GC)}.  The GC is responsible for administration
+		of group members as well as initializing/synchronizing the key 
+		agreement procedure.
+       \item    The \code{BinaryTree} class is an array based binary tree, see 
+		section \ref{xref:binarytree}.
+       \item    A group has both a secure channel, see section
+		\ref{xref:securechannel}, for private group communication, as
+		well as an insecure channel, see section 
+		\ref{xref:insecurechannel}, for trivial group communication and
+		management.
+     \end{itemize}
+    \section{Design Flaws}
+    \label{xfer:design_flaws}
+     \begin{itemize}
+       \item    The initialization of the \code{SecureChannel} should be done
+		within an additional thread.  This would free up the 
+                \code{InsecureChannel} thread that is waiting on new messages, 
+		so they are not lost.
+       \item    Our lack of knowledge of M2MP prevented us from writing 
+		protocols that effectively used its functionality.
+     \end{itemize}
+    \section{Known Problems}
+    \label{xfer:known_problems}
+     The following scenarios have not been handled yet.  In our ongoing attempt
+     to provide a user with the functionality to communicate securely with more
+     than one person, the following will be addressed.  At present, the outcome
+     of the following scenarios will produce unexpected results.
+     \begin{itemize}
+	\item	A timeout occurs during the key agreement procedure
+	\item	Two users attempt to create a group/join a group at the same 
+		time.
+	\item	A member joins the group during the key agreement procedure.
+	\item	A member leaves the group during the key agreement procedure.
+	\item   More than \begin{math} 2^{32} - 2 \end{math} members join the 
+		group, since we keep track of members by their member index, 
+		stored by an integer, and we reserver 0 and -1 as special cases.
+		The integer is just incremented every time a member joins the 
+		group, but leaving member's indexes are not remembered and 
+		reused.
+     \end{itemize}
+
+    \section{Binary Tree}
+    \label{xref:binary_tree}
+     All members of the group are kept in the \code{BinaryTree}.  Every position
+     in the tree is kept with a \code{BinaryTreeNode}.  
+        \subsection{BinaryTree}
+        \label{xref:binarytree}
+	 The only resemblance this class has to a standard binary tree is that,
+	 at most, any node is allowed to have 2 children.  The 
+	 \code{BinaryTreeNode} objects are kept in an array.  By putting
+	 the tree in an array, transmitting the structure of the existing tree, 
+	 to newly joining members, was very easy.  As an array based
+	 binary tree, Perrig's algorithm for key agreement was also much 
+	 easier.\\
+	 \\
+	 When a new member is inserted into the tree, the tree tries to insert 
+	 the new node as close to the root as possible.  Members can only be 
+	 leaves, so every node that is not a leaf has to be an empty node with
+	 the member index of -1, symbolizing that it's an intermediary node.
+	 Also, anytime a new level is added, the entire level (breadth-wise) is
+	 filled with place holders.  These place holders have a member index
+	 of 0 and contain no data.\\
+	 \\
+	 The \code{BinaryTree} class also provides the functionality to store
+	 a member's key based on level of choice.  That way the \code{Group}
+	 can store the intermediate keys during the key agreement procedure
+
+        \subsection{BinaryTreeNode}
+        \label{xref:binarytreenode}
+	 A \code{BinaryTreeNode} is nothing more than a wrapper that holds two
+	 values.  A \\\code{java.math.BigInteger} that is used as the key for 
+	 the current node and an \code{int} that is used as the member index.
+	 The member indexes 0 and -1 are reserved for internal use.
+	 \begin{description}
+	   \item[0]	A placeholder.  There is no data here, but 
+			\code{java.util.Vector} cannot contain \textit{holes}, 
+			so in order to use it the way we wanted, placeholders 
+			must be used.
+	   \item[-1]    An intermediate node.  Because our members can only
+			be in leaves, we need intermediary 
+			\code{BinaryTreeNode}s on every level above the leaves.
+			This is where keys are placed.  
+	 \end{description}
+
+    \section{Group}
+    \label{xref:group}
+     The CPU/brain of our Secure Group Communication package would 
+     be the \code{Group} class.  All of the functionality that is provided by 
+     the Secure Group Communication package is accessed, by the user, through 
+     the \code{Group} class.  All of the other classes in this package
+     are hidden from the user.\\
+     \\
+     The \code{Group} will work directly with the \code{InsecureChannel},
+     see section \ref{xref:insecurechannel}, to carry out the setup
+     of the group.  When a user requests to join a group, the \code{Group} will
+     send out a packet looking for the Group Controller.  If the response times
+     out the user will create the group.  If the user gets back a response
+     from the GC, then the user knows that the group exists and that he is not 
+     the GC.  The GC will also send the new user a list of the current members 
+     and their respective positions in the tree, see section 
+     \ref{xref:binary_tree}.
+
+      \subsection{Group Public Signature}
+      \label{xref:group_public_signature}
+       The signature of \code{Group} is the signature of the Secure Group
+       Communication, since all functionality is accessed through the 
+       \code{Group} class.\\\\
+	\begin{tabular} {ll}
+	   \code{Group( String gn,} 
+	     & Join/Create the group \textit{groupName}. \\
+	   \hspace{.6in}\code{MessageReceived ref )} 
+	     & \hspace{.3in} Pass yourself as a reference for \\
+	     & \hspace{.3in} callbacks upon received \\
+	     & \hspace{.3in} messages\\
+	   \code{leave()} 
+	     & Leave the group \\
+	   \code{sendInsecureMessage( String msg )} 
+	     & Send \textit{msg} over the \code{InsecureChannel} \\
+	   \code{sendSecureMessage( String msg )} 
+	     & Send \textit{msg} over the \code{SecureChannel} \\
+	\end{tabular} 
+
+      \subsection{Heartbeat}
+      \label{xref:heartbeat}
+	Because of an ad hoc environment's dynamic nature, you must check to see
+	that every member in the group is still \textit{alive}, that is to say,
+	they are still present.  We achieve the assurance, of all members
+	being \textit{alive}, by having every member send a \code{Heartbeat}
+	to every other member, every \code{HB\_delay} seconds (section 
+	\ref{xref:group_performance_tuning}).  Every member then checks on
+	the status of the other members every \code{HB\_check\_delay} seconds
+	(section \ref{xref:group_performance_tuning}). If any member has been
+	idle (i.e. we have not received a \code{Heartbeat} from them) in 
+	\code{HB\_TO} seconds (section \ref{xref:group_performance_tuning}), 
+	then we will notify the GC and remove that member from their 
+	\code{BinaryTree}.
+
+      \newpage
+      \subsection{Group Performance Tuning}
+      \label{xref:group_performance_tuning}
+       Another constructor is available to the user to tailor the timeouts of
+       the \code{Group} class. 
+
+       \subsubsection{Constructor}
+       \begin{tabbing}
+       \code{Group(} \=\code{String} \hspace{.8in} \=\code{groupName, }      \\
+		     \>\code{MessageReceived}      \>\code{applicationRef,}  \\ 
+		     \>\code{int}                  \>\code{join\_TO,}        \\
+		     \>\code{int}	           \>\code{HB\_send\_delay,} \\
+		     \>\code{int}	           \>\code{HB\_check\_delay,}\\
+		     \>\code{int}	           \>\code{HB\_TO,}          \\
+		     \>\code{int}                  \>\code{key\_TO )}        \\
+       \end{tabbing}
+       \begin{tabular} {ll}
+	   \code{join\_TO}
+	     & Number of milliseconds to wait before join call timeout \\
+	     & \hspace{.3in} and the group is created \\
+	   \code{HB\_send\_delay}
+	     & Number of milliseconds to wait in between heartbeat sends \\
+	   \code{HB\_check\_delay}
+	     & Number of milliseconds to wait in between checking the \\
+	     & \hspace{.3in} status of other members \\
+	   \code{HB\_TO}
+	     & Number of milliseconds before assuming a group memeber \\
+	     & \hspace{.3in} is dead and expelling them \\
+	   \code{key\_TO}
+	     & Time to wait before assuming a group member is dead \\
+	     & \hspace{.3in} during key agreement \\
+       \end{tabular}\\
+
+       \subsubsection{Accessors and Mutators}
+     All of these values, can be changed on the fly using the following 
+     accessors and mutators. \\\\
+       \begin{tabular} {ll}
+	   \code{void setJoinTimeout( int t )}
+	     & Change or acquire current \\
+	   \code{int \hspace{.1in}getJoinTimeout()}
+	     & \hspace{.3in}\code{join\_TO} \\\\
+	   \code{void setHeartBeatDelay( int t )}
+	     & Change or acquire current \\
+	   \code{int \hspace{.1in}getHeartBeatDelay()}
+	     & \hspace{.3in}\code{HB\_send\_delay}\\\\
+	   \code{void setHeartBeatCheckDelay( int t )}
+	     & Change or acquire current \\
+	   \code{int \hspace{.1in}getHeartBeatCheckDelay()}
+	     & \hspace{.3in}\code{HB\_check\_delay}\\\\
+	   \code{void setHeartBeatTimeout( int t )}
+	     & Change or acquire current \\
+	   \code{int \hspace{.1in}getHeartBeatTimeout()}
+	     & \hspace{.3in}\code{HB\_TO} \\\\
+	   \code{void getKeyProcTimeout( int t )}
+	     & Change or acquire current \\
+	   \code{int \hspace{.1in}setKeyProcTimeout()}
+	     & \hspace{.3in}\code{key\_TO} \\\\
+       \end{tabular}
+
+    \section{Communication Channels}
+    \label{xref:communication_channels}
+      \subsection{InsecureChannel}
+      \label{xref:insecurechannel}
+	The \code{InsecureChannel} is used for all group management.  When
+	a user joins a group, since key agreement has not yet taken place, 
+	the communication must be done insecurely.   After a user has 
+	entered a group, then key agreement takes place, and is also done 
+	over the \code{InsecureChannel}.  After key agreement has been 
+	completed, all subsequent group communication is done over the 
+	\code{SecureChannel}.
+	\subsubsection{TimeoutException}
+	\label{xref:timeoutexception}
+	  The \code{TimeoutException} is thrown by the blocking 
+	  \code{receiveMessage( long timeout, int address )} 
+	  call in \code{InsecureChannel} after \textit{timeout} 
+	  milliseconds.
+
+
+    \subsection{SecureChannel}
+    \label{xref:securechannel}
+      All secure group communication is done over the \code{SecureChannel}.
+      Once a group key has been established, through key agreement procedure
+      carried out over the \code{InsecureChannel}, the \code{Group} class 
+      initializes the \code{SecureChannel}.  The \code{SecureChannel} then 
+      uses the \code{MultiKeyGenerator} to encrypt and decrypt messages as 
+      needed.
+		    
+      \subsubsection{MultiKeyGenerator}
+      \label{xref:multikeygenerator}
+	The \code{MultiKeyGenerator} is used by the \code{SecureChannel}
+	to encrypt and decrypt messages.  The \code{MutliKeyGenerator}
+	uses password based encryption with MD5 and DES, see 
+	\textbf{Java\texttrademark Cryptography Ex (JCE) Reference Guide}
+	for more information.  The \code{MultiKeyGenerator} removes the 
+	knowledge about how the data is encrypted from the 
+	\code{SecureChannel}. Abstracting the data encryption and decryption
+	from the \code{SecureChannel} is useful because it takes out 
+	complexity from the channel, and also decouples the encryption from
+	itself.
+
+    \section{Future Work}
+    \label{xref:future_work}
+      \begin{itemize}
+    	    \item   Change implementation of key agreement from current state
+	    	    to use Gunther's key agreement. 
+	    \item   Rework protocol structure so that it is optimized for speed.
+	    \item   Create the SecureChannel in a separate thread so that it
+	    	    will not block the group object from receiving insecure 
+		    messages during key generation.
+	    \item   Address the problem of timeouts during the key agreement
+	    	    procedure.
+	    \item   Manage the group member indexes so that numbers may be 
+		    reused if the necessity arises.
+	    \item   If a member leaves during key agreement, cancel key 
+		    agreement and process leave.
+	    \item   If a member joins during key agreement, cancel key agreement
+		    and process join.
+	    \item   Test our protocol in a real ad hoc environment.
+      \end{itemize}
+\end{document}

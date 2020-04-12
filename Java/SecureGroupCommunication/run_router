@@ -1,0 +1,2 @@
+#!/bin/sh
+java -classpath /Users/ericferguson/Development/Java/m2miapi/lib edu.rit.m2mp.ip.M2MPRouter

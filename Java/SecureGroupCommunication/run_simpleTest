@@ -1,0 +1,5 @@
+#!/bin/sh
+export CLASSPATH=/Users/ericferguson/Development/Java/m2miapi/lib:.:..
+
+java SecureGroupCommunication.SimpleTest asdf
+

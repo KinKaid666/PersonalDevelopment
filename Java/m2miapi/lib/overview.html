@@ -1,0 +1,143 @@
+<HTML>
+<HEAD>
+<TITLE>The M2MI Library</TITLE>
+</HEAD>
+<BODY>
+
+The M2MI Library is the API for
+<B>Many-to-Many Invocation (M2MI),</B>
+a new paradigm for building collaborative systems
+that run in wireless proximal ad hoc networks
+of fixed and mobile computing devices.
+<P>
+<B>M2MI Library Version 02-Jul-2002</B>
+
+<P>
+<HR>
+<H2>Table of Contents</H2>
+
+1. <A HREF="#installation">Installation</A>
+<BR>
+2. <A HREF="#gettingstarted">Getting Started</A>
+<BR>
+3. <A HREF="#license">License</A>
+<BR>
+4. <A HREF="#history">Revision History</A>
+
+<P>
+<HR>
+<A NAME="installation"><H2>1. Installation</H2></A>
+
+<P>
+The M2MI Library requires
+Java Development Kit (JDK) 1.4.0.
+<P>
+To install the M2MI Library,
+just unpack the JAR file
+containing the M2MI distribution,
+<TT>"m2miapi20020702.jar"</TT>.
+The distribution expands into a subdirectory
+named <TT>"m2miapi20020702"</TT>.
+<P>
+Documentation is stored under directory
+<TT>"m2miapi20020702/doc"</TT>;
+point your HTML browser to that directory.
+<P>
+Java source files and class files
+are stored under directory
+<TT>"m2miapi20020702/lib"</TT>;
+add that directory to your classpath
+when you run the programs.
+
+<P>
+<HR>
+<A NAME="gettingstarted"><H2>2. Getting Started</H2></A>
+
+<P>
+The M2MI Library comprises three principal packages;
+see each package&#146;s documentation
+for further information:
+<UL>
+<P><LI>
+Package <A HREF="edu/rit/m2mi/package-summary.html">edu.rit.m2mi</A>
+provides M2MI itself.
+<P><LI>
+Package <A HREF="edu/rit/m2mp/package-summary.html">edu.rit.m2mp</A>
+provides the Many-to-Many Protocol (M2MP),
+which is used to transport M2MI messages.
+<P><LI>
+Package <A HREF="edu/rit/classfile/package-summary.html">edu.rit.classfile</A>
+provides the RIT Classfile Library (RCL),
+which is used to synthesize M2MI proxy classes.
+</UL>
+<P>
+To get started with M2MI,
+read the documentation for package
+<A HREF="edu/rit/m2mi/package-summary.html">edu.rit.m2mi</A>
+and try the examples provided.
+
+<P>
+<HR>
+<A NAME="license"><H2>3. License</H2></A>
+
+<P>
+The documentation and Java source files
+in the M2MI Library,
+the M2MP Library,
+and the RIT Classfile Library
+("The Libraries")
+are copyright &copy; 2001, 2002
+by the Rochester Institute of Technology.
+All rights reserved.
+For further information, contact the author, Alan Kaminsky,
+at <A HREF="mailto:ark@it.rit.edu">ark@it.rit.edu</A>.
+<P>
+The Libraries are
+free software; you can redistribute them and/or modify them under the terms of
+the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+<P>
+The Libraries are distributed in the hope that they will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+details.
+<P>
+A copy of the GNU General Public License
+is provided in the file <A HREF="edu/rit/classfile/doc-files/gpl.txt"><TT>gpl.txt</TT></A>.
+You may also obtain a copy of the GNU General Public License
+on the World Wide Web at
+<A HREF="http://www.gnu.org/licenses/gpl.html" TARGET="_top">http://www.gnu.org/licenses/gpl.html</A>
+or by writing to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+
+<P>
+<HR>
+<A NAME="history"><H2>4. Revision History</H2></A>
+
+<DL COMPACT>
+
+<P><DT>02-Jul-2002
+<DD>
+Changed the channel implementation
+used to broadcast M2MP messages
+to all processes on the local host
+so it will work properly on Sun Solaris systems
+as well as Linux systems;
+the implementation is now contained in classes
+edu.rit.m2mp.ip.M2MPRouter (revised) and
+edu.rit.m2mp.ip.M2MPRouterChannel (new).
+Changed the chat demo application
+(class edu.rit.m2mi.test.ChatDemo)
+to put the user interface in a separate class
+from the exported chat object.
+
+<P><DT>07-Jun-2002
+<DD>
+Initial version.
+Released under the terms of the GNU General Public License.
+
+</DL>
+
+</BODY>
+</HTML>

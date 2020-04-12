@@ -1,0 +1,20 @@
+\contentsline {section}{\numberline {1}Introduction}{3}
+\contentsline {subsection}{\numberline {1.1}Adrian Perrig Communication Paper Review}{3}
+\contentsline {section}{\numberline {2}Design Notes}{4}
+\contentsline {section}{\numberline {3}Design Flaws}{4}
+\contentsline {section}{\numberline {4}Known Problems}{5}
+\contentsline {section}{\numberline {5}Binary Tree}{5}
+\contentsline {subsection}{\numberline {5.1}BinaryTree}{5}
+\contentsline {subsection}{\numberline {5.2}BinaryTreeNode}{6}
+\contentsline {section}{\numberline {6}Group}{6}
+\contentsline {subsection}{\numberline {6.1}Group Public Signature}{6}
+\contentsline {subsection}{\numberline {6.2}Heartbeat}{7}
+\contentsline {subsection}{\numberline {6.3}Group Performance Tuning}{8}
+\contentsline {subsubsection}{\numberline {6.3.1}Constructor}{8}
+\contentsline {subsubsection}{\numberline {6.3.2}Accessors and Mutators}{8}
+\contentsline {section}{\numberline {7}Communication Channels}{9}
+\contentsline {subsection}{\numberline {7.1}InsecureChannel}{9}
+\contentsline {subsubsection}{\numberline {7.1.1}TimeoutException}{9}
+\contentsline {subsection}{\numberline {7.2}SecureChannel}{9}
+\contentsline {subsubsection}{\numberline {7.2.1}MultiKeyGenerator}{10}
+\contentsline {section}{\numberline {8}Future Work}{10}

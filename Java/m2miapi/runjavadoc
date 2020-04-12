@@ -1,0 +1,9 @@
+#!/bin/bash
+SOURCE_HOME=/home/ark/Anhinga/Java/m2misynth
+JDK_HOME=/usr/java/j2sdk1.4.0
+SOURCEPATH=$SOURCE_HOME/lib
+BOOTCLASSPATH=$JDK_HOME/jre/lib/rt.jar
+DOCDIR=$SOURCE_HOME/doc
+LINKURL1=file://$JDK_HOME/docs/api
+OVERVIEWFILE=$SOURCEPATH/overview.html
+javadoc -sourcepath $SOURCEPATH -bootclasspath $BOOTCLASSPATH -d $DOCDIR -use -splitindex -doctitle "THE M2MI LIBRARY" -link $LINKURL1 -windowtitle "M2MI Library Documentation" -bottom "<FONT SIZE=-2>Copyright &copy; 2002 by the Rochester Institute of Technology. All rights reserved. Send comments to <A HREF=\"mailto:anhinga@cs.rit.edu\">anhinga@cs.rit.edu</A>.</FONT>" -overview $OVERVIEWFILE edu.rit.classfile edu.rit.classfile.unittest edu.rit.m2mi edu.rit.m2mi.life3 edu.rit.m2mi.matrix1 edu.rit.m2mi.matrix2 edu.rit.m2mi.nbodies1 edu.rit.m2mi.test edu.rit.m2mp edu.rit.m2mp.debug edu.rit.m2mp.ip edu.rit.m2mp.packet edu.rit.m2mp.test edu.rit.util

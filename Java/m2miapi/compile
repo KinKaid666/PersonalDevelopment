@@ -1,0 +1,75 @@
+#!/bin/bash
+SOURCE_HOME=`pwd`
+CLASSPATH=$SOURCE_HOME/lib
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/util
+cd $SOURCE_HOME/lib/edu/rit/util
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/classfile
+cd $SOURCE_HOME/lib/edu/rit/classfile
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/classfile/unittest
+cd $SOURCE_HOME/lib/edu/rit/classfile/unittest
+rm *.class
+javac -classpath $CLASSPATH GenTest02.java
+java -classpath $CLASSPATH edu.rit.classfile.unittest.GenTest02
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mp/packet
+cd $SOURCE_HOME/lib/edu/rit/m2mp/packet
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mp
+cd $SOURCE_HOME/lib/edu/rit/m2mp
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mp/debug
+cd $SOURCE_HOME/lib/edu/rit/m2mp/debug
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mp/ip
+cd $SOURCE_HOME/lib/edu/rit/m2mp/ip
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mp/test
+cd $SOURCE_HOME/lib/edu/rit/m2mp/test
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mi
+cd $SOURCE_HOME/lib/edu/rit/m2mi
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mi/life3
+cd $SOURCE_HOME/lib/edu/rit/m2mi/life3
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mi/matrix1
+cd $SOURCE_HOME/lib/edu/rit/m2mi/matrix1
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mi/matrix2
+cd $SOURCE_HOME/lib/edu/rit/m2mi/matrix2
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mi/nbodies1
+cd $SOURCE_HOME/lib/edu/rit/m2mi/nbodies1
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+echo Compiling $SOURCE_HOME/lib/edu/rit/m2mi/test
+cd $SOURCE_HOME/lib/edu/rit/m2mi/test
+rm *.class
+javac -classpath $CLASSPATH *.java
