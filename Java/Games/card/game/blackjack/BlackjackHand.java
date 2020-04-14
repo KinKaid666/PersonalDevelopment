@@ -7,9 +7,15 @@ import java.util.List ;
 
 public class BlackjackHand
 {
+    public enum Outcome
+    {
+        Win,
+        Loss,
+        Push
+    }
+
     public enum BlackjackHandValue
     {
-        Four,
         Five,
         Six,
         Seven,
@@ -26,6 +32,7 @@ public class BlackjackHand
         Eighteen,
         Nineteen,
         Twenty,
+        TwentyOne,
         SoftTwelve,
         SoftThirteen,
         SoftFourteen,
@@ -60,6 +67,16 @@ public class BlackjackHand
         cardsInHand_ = new LinkedList<Card>() ;
         cardsInHand_.add(one) ;
         cardsInHand_.add(two) ;
+    }
+
+    public int cardCount()
+    {
+        return cardsInHand_.size() ;
+    }
+
+    public Card getCard(int card)
+    {
+        return cardsInHand_.get(card) ;
     }
 
     public void add(Card card)
@@ -174,7 +191,8 @@ public class BlackjackHand
                 if( isSoft() ) return BlackjackHandValue.SoftTwenty ;
                 return BlackjackHandValue.Twenty ;
             case 21:
-                return BlackjackHandValue.Blackjack ;
+                if(cardsInHand_.size() == 2) return BlackjackHandValue.Blackjack ;
+                return BlackjackHandValue.TwentyOne ;
         }
         return BlackjackHandValue.Busted ;
     }
@@ -239,8 +257,7 @@ public class BlackjackHand
 
     public String toString()
     {
-        int val = getHandValue() ;
-        String a = "(" + (val<10?" ":"") + val + ") "+ getStrategicHandValue() ;
+        String a = "(" + getHandValue() + ") " + getStrategicHandValue() ;
         for( int i = 0 ; i < cardsInHand_.size() ; ++i )
         {
             if(i ==0)
