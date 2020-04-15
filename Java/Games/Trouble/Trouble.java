@@ -1,3 +1,4 @@
+package Trouble ;
 import java.io.* ;
 class Trouble
 {

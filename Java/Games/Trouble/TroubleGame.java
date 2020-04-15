@@ -1,4 +1,6 @@
+package Trouble ;
 import java.lang.Exception ;
+import dice.Die ;
 class TroubleGame
 {
     private static int REPEAT_ROLL       = 6 ;
@@ -9,7 +11,7 @@ class TroubleGame
     private int _totalMoves ;
     private boolean _gameOver ;
     private TroubleBoard _board ;
-    private TroubleDice  _dice ;
+    private Die  _dice ;
 
     //
     // Create trouble game
@@ -17,7 +19,7 @@ class TroubleGame
     {
         _numPlayers = numPlayers ;
         _board = new TroubleBoard(_numPlayers,PIECES_PER_PLAYER) ;
-        _dice  = new TroubleDice() ;
+        _dice  = new Die() ;
         StartGame() ;
     }
 
@@ -42,7 +44,7 @@ class TroubleGame
         {
             //
             // First roll the dice
-            roll = _dice.Roll() ;
+            roll = _dice.roll() ;
 
             //System.out.println("Player " + _turn + " has rolled a : "+ roll ) ;
             //

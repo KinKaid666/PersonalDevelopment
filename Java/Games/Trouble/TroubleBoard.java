@@ -3,6 +3,7 @@
 //
 // The board is a 2d matrix of ints the includes the finish slots, the home rows
 //   and the spaces between
+package Trouble ;
 import java.lang.Exception ;
 
 class TroubleBoard

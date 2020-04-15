@@ -1,3 +1,4 @@
+package Trouble ;
 import java.util.Random ;
 public class TroubleDice
 {
