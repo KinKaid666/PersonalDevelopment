@@ -13,7 +13,6 @@ public class Blackjack
 
     private BlackjackRules        rules_         = null ;
     private List<BlackjackPlayer> players_       = null ;
-    private int                   numberOfDecks_ = 0 ;
     private Shoe                  cardShoe_      = null ;
 
     /* stats */
@@ -33,14 +32,12 @@ public class Blackjack
 
     public Blackjack(
         BlackjackRules        rules,
-        List<BlackjackPlayer> players,
-        Integer               numberOfDecks
+        List<BlackjackPlayer> players
     )
     {
         rules_ = rules ;
         players_ = players ;
-        numberOfDecks_ = numberOfDecks ;
-        cardShoe_ = new Shoe(numberOfDecks_) ;
+        cardShoe_ = new Shoe(rules.getNumberOfDecks()) ;
 
         cardShoe_.shuffle() ;
     }
@@ -52,64 +49,74 @@ public class Blackjack
             BlackjackHand[] hands = deal() ;
             int i = 0 ;
 
-            //System.out.println("*** (Hand:" + numHands + ") ***") ;
-            //System.out.println("    Dealer starts with hand (upcard first): " + hands[hands.length - 1] + " ***" ) ;
+            System.out.println("*** (Hand:" + hands_/players_.size() + ") ***") ;
+            System.out.println("    Dealer starts with hand (upcard first): " + hands[hands.length - 1] + " ***" ) ;
+            // Dumb initial version, only see upcard
+            BlackjackHand dealerUpcardHand = new BlackjackHand() ;
+            dealerUpcardHand.add(hands[hands.length-1].getCard(0)) ;
             for( BlackjackPlayer p : players_ )
             {
-                //System.out.println("    (" + p.getName() + ") starts with hand : " + hands[i]) ;
+                System.out.println("    (" + p.getName() + ") starts with hand : " + hands[i]) ;
 
-                // Dumb initial version, only see upcard
-                BlackjackHand dealerUpcardHand = new BlackjackHand() ;
-                dealerUpcardHand.add(hands[hands.length-1].getCard(0)) ;
+
+                //
+                // TODO: Add strategy object
+                // while( STAND != p.determineMove(hands[i],dealerUpcardHand) &&
+                //        !hand[i].busted()
                 while( hands[i].getHandValue() < 17 && dealerUpcardHand.getHandValue() >= 7)
                 {
                     hands[i].add(cardShoe_.getNextCard()) ;
                 }
                 ++i ;
             }
-            // Dumb version
-            while( hands[hands.length-1].getHandValue() < 17 )
+
+            //
+            // Dealer hitting
+            //   TODO: if everyone busted, don't draw
+            while( hands[hands.length-1].getHandValue() < 17 ||
+                   (hands[hands.length-1].getHandValue() == 17 && hands[hands.length-1].isSoft()) && rules_.getDealerHitSoft17())
             {
                 hands[hands.length-1].add(cardShoe_.getNextCard()) ;
             }
             i = 0 ;
-            //System.out.println("    *** Dealer ends with hand : " + hands[hands.length - 1] + " ***" ) ;
+            System.out.println("    *** Dealer ends with hand : " + hands[hands.length - 1] + " ***" ) ;
             for( BlackjackPlayer p : players_ )
             {
                 ++hands_ ;
-                //System.out.print("        (" + p.getName() + ") ends with hand : " + hands[i]) ;
+                System.out.print("        (" + p.getName() + ") ends with hand : " + hands[i]) ;
                 if( hands[i].busted() )
                 {
-                    //System.out.println( " : loss (busted)" ) ;
+                    System.out.println( " : loss (busted)" ) ;
                     ++losses_ ;
                 }
                 else if( hands[hands.length-1].busted() )
                 {
-                    //System.out.println( " : win (dealer busted)" ) ;
+                    System.out.println( " : win (dealer busted)" ) ;
                     ++wins_ ;
                 }
                 else if( hands[i].lessThan(hands[hands.length-1]))
                 {
-                    //System.out.println( " : loss" ) ;
+                    System.out.println( " : loss" ) ;
                     ++losses_ ;
                 }
                 else if( hands[i].greaterThan(hands[hands.length-1]) )
                 {
-                    //System.out.println( " : win" ) ;
+                    System.out.println( " : win" ) ;
                     ++wins_ ;
                 }
                 else if( hands[i].equals(hands[hands.length-1]) )
                 {
-                    //System.out.println( " : push" ) ;
+                    System.out.println( " : push" ) ;
                     ++pushes_ ;
                 }
                 else
                 {
-                    System.out.println( " : ???" ) ;
+                    System.err.println( " : ???" ) ;
+                    System.exit(1) ; // bad
                 }
                 ++i ;
             }
-            //System.out.println() ;
+            System.out.println() ;
         }
     }
 
@@ -140,9 +147,9 @@ public class Blackjack
     public void printStats()
     {
         System.out.printf("Stats : %,10d hands\n", hands_) ;
-        System.out.printf("      : %,10d losses or %02.2f%%\n",losses_,(losses_*1.0/hands_)) ;
-        System.out.printf("      : %,10d wins   or %02.2f%%\n",wins_,  (wins_  *1.0/hands_)) ;
-        System.out.printf("      : %,10d pushes or %02.2f%%\n",pushes_,(pushes_*1.0/hands_)) ;
+        System.out.printf("      : %,10d losses or %02.2f%%\n",losses_,(losses_*100.0/hands_)) ;
+        System.out.printf("      : %,10d wins   or %02.2f%%\n",wins_,  (wins_  *100.0/hands_)) ;
+        System.out.printf("      : %,10d pushes or %02.2f%%\n",pushes_,(pushes_*100.0/hands_)) ;
     } 
 
 }

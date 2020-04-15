@@ -1,5 +1,5 @@
 import java.util.Random ;
-class TroubleDice
+public class TroubleDice
 {
     private static int _diceMin = 0 ;
     private static int _diceMax = 6 ;

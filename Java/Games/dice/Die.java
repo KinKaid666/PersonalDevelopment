@@ -1,15 +1,22 @@
+package dice ;
 import java.util.Random ;
-class Die
+
+public class Die
 {
-    private static int _diceMin = 0 ;
-    private static int _diceMax = 6 ;
-    private int  _diceValue ;
-    private Random _random ;
+    private static int diceMin_ = 0 ;
+    private static int diceMax_ = 6 ;
+    private int  diceValue_ ;
+    private static Random random_ ;
+    private static boolean randomInitialized_ = false ;
 
     public Die()
     {
-        _random = new Random(System.currentTimeMillis()) ;
-        _diceValue = 0 ;
+        if(!randomInitialized_)
+        {
+            random_ = new Random(System.currentTimeMillis()) ;
+            randomInitialized_ = true ;
+        }
+        diceValue_ = 0 ;
     }
 
 
@@ -17,14 +24,14 @@ class Die
     // Roll the dice
     public int roll()
     {
-        _diceValue = (int)(_random.nextDouble() * (_diceMax - _diceMin)) + 1 ;
-        return _diceValue ;
+        diceValue_ = (int)(random_.nextDouble() * (diceMax_ - diceMin_)) + 1 ;
+        return diceValue_ ;
     }
 
     //
     // Getter
     public int value()
     {
-        return _diceValue ;
+        return diceValue_ ;
     }
 } ;
