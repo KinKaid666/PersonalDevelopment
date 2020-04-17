@@ -28,8 +28,11 @@ import card.Card ;
  *     C=Surrender (capitulate)
  *     X=Do nothing
  */
+// TODO: store each filename into a has so we don't re-create each object
 public class BlackjackStrategy
 {
+    private static Map<String, BlackjackStrategy> strategies_ = new HashMap<String,BlackjackStrategy>() ;
+
     private final static String      PAIRS_STRING = "Pairs"    ;
     private final static String SOFT_TOTAL_STRING = "SoftTotal" ;
     private final static String HARD_TOTAL_STRING = "HardTotal" ;
@@ -228,84 +231,95 @@ public class BlackjackStrategy
 
     public static BlackjackStrategy createStrategyFromFile(String filename) throws Exception
     {
-        File sFile = new File(filename) ;
-        BufferedReader br = new BufferedReader(new FileReader(sFile)) ;
+        BlackjackStrategy s = null ;
 
-        String fileContents = new String() ;
-        String fileLine ;
-        while((fileLine = br.readLine()) != null)
+        // first try to find if we've already got this strategy object built
+        if(strategies_.containsKey(filename))
         {
-            fileLine = fileLine.replaceAll("\\s", "");
-            if(fileLine.indexOf('#') >= 0)
-            {
-                fileLine = fileLine.substring(0,fileLine.indexOf('#')) ;
-            }
-            fileContents += fileLine ;
+            s = strategies_.get(filename) ;
         }
+        else
+        {
+            File sFile = new File(filename) ;
+            BufferedReader br = new BufferedReader(new FileReader(sFile)) ;
 
-        String[] pieces = fileContents.split("}") ;
-        String pairs = null, soft = null, hard = null, sur  = null;
-        for(int i = 0 ; i < pieces.length ; ++i )
-        {
-            if(pieces[i].contains(PAIRS_STRING))
+            String fileContents = new String() ;
+            String fileLine ;
+            while((fileLine = br.readLine()) != null)
             {
-                pairs = pieces[i].substring(pieces[i].indexOf("{")+1) ;
+                fileLine = fileLine.replaceAll("\\s", "");
+                if(fileLine.indexOf('#') >= 0)
+                {
+                    fileLine = fileLine.substring(0,fileLine.indexOf('#')) ;
+                }
+                fileContents += fileLine ;
             }
-            else if(pieces[i].contains(SOFT_TOTAL_STRING))
+
+            String[] pieces = fileContents.split("}") ;
+            String pairs = null, soft = null, hard = null, sur  = null;
+            for(int i = 0 ; i < pieces.length ; ++i )
             {
-                soft = pieces[i].substring(pieces[i].indexOf("{")+1) ;
+                if(pieces[i].contains(PAIRS_STRING))
+                {
+                    pairs = pieces[i].substring(pieces[i].indexOf("{")+1) ;
+                }
+                else if(pieces[i].contains(SOFT_TOTAL_STRING))
+                {
+                    soft = pieces[i].substring(pieces[i].indexOf("{")+1) ;
+                }
+                else if(pieces[i].contains(HARD_TOTAL_STRING))
+                {
+                    hard = pieces[i].substring(pieces[i].indexOf("{")+1) ;
+                }
+                else if(pieces[i].contains(SURRENDER_STRING))
+                {
+                    sur = pieces[i].substring(pieces[i].indexOf("{")+1) ;
+                }
             }
-            else if(pieces[i].contains(HARD_TOTAL_STRING))
+            Map<Integer,Map<Card,StrategicMove>>     pairsStrategies = null ;
+            Map<Integer,Map<Card,StrategicMove>> softTotalStrategies = null ;
+            Map<Integer,Map<Card,StrategicMove>> hardTotalStrategies = null ;
+            Map<Integer,Map<Card,StrategicMove>> surrenderStrategies = null ;
+            if( pairs != null )
             {
-                hard = pieces[i].substring(pieces[i].indexOf("{")+1) ;
+                pairsStrategies = processMoveConfiguration(pairs) ;
             }
-            else if(pieces[i].contains(SURRENDER_STRING))
+            else
             {
-                sur = pieces[i].substring(pieces[i].indexOf("{")+1) ;
+                throw new Exception("Invalid config: missing pairs configuation") ;
             }
+            if( soft != null )
+            {
+                softTotalStrategies = processMoveConfiguration(soft) ;
+            }
+            else
+            {
+                throw new Exception("Invalid config: missing soft totals configuration") ;
+            }
+            if( hard != null )
+            {
+                hardTotalStrategies = processMoveConfiguration(hard) ;
+            }
+            else
+            {
+                throw new Exception("Invalid config: missing hard totals configuration") ;
+            }
+            if( sur != null )
+            {
+                surrenderStrategies = processMoveConfiguration(sur) ;
+            }
+            else
+            {
+                throw new Exception("Invalid config: missing surrender configuration") ;
+            }
+            s = new BlackjackStrategy(pairsStrategies,
+                                      softTotalStrategies,
+                                      hardTotalStrategies,
+                                      surrenderStrategies,
+                                      false,
+                                      false) ;
+            strategies_.put(filename,s) ;
         }
-        Map<Integer,Map<Card,StrategicMove>>     pairsStrategies = null ;
-        Map<Integer,Map<Card,StrategicMove>> softTotalStrategies = null ;
-        Map<Integer,Map<Card,StrategicMove>> hardTotalStrategies = null ;
-        Map<Integer,Map<Card,StrategicMove>> surrenderStrategies = null ;
-        if( pairs != null )
-        {
-            pairsStrategies = processMoveConfiguration(pairs) ;
-        }
-        else
-        {
-            throw new Exception("Invalid config: missing pairs configuation") ;
-        }
-        if( soft != null )
-        {
-            softTotalStrategies = processMoveConfiguration(soft) ;
-        }
-        else
-        {
-            throw new Exception("Invalid config: missing soft totals configuration") ;
-        }
-        if( hard != null )
-        {
-            hardTotalStrategies = processMoveConfiguration(hard) ;
-        }
-        else
-        {
-            throw new Exception("Invalid config: missing hard totals configuration") ;
-        }
-        if( sur != null )
-        {
-            surrenderStrategies = processMoveConfiguration(sur) ;
-        }
-        else
-        {
-            throw new Exception("Invalid config: missing surrender configuration") ;
-        }
-        BlackjackStrategy s = new BlackjackStrategy(pairsStrategies,
-                                                    softTotalStrategies,
-                                                    hardTotalStrategies,
-                                                    surrenderStrategies,
-                                                    false,
-                                                    false) ;
         return s ;
     }
 

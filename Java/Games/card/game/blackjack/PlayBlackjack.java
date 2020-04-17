@@ -50,7 +50,7 @@ class PlayBlackjack
             BlackjackPlayer p = null ;
             try
             {
-                p = new BlackjackPlayer("Player " + i, BlackjackStrategy.createStrategyFromFile("/Users/ericferguson/Development/Java/Games/card/game/blackjack/Strategies/default.stg")) ;
+                p = new BlackjackPlayer("Player " + i, BlackjackStrategy.createStrategyFromFile("/Users/ericferguson/Development/Java/Games/card/game/blackjack/Strategies/perfect.stg")) ;
             }
             catch (Exception e)
             {
