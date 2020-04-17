@@ -130,6 +130,11 @@ public class BlackjackHand
         return compareTo(other) == 0 ;
     }
 
+    public boolean isBlackjack()
+    {
+        return (cardCount() == 2 && getHandValue() == 21) ;
+    }
+
     /*
      * it's soft when one of the aces is counting for 10
      *    -> need 1 or more aces

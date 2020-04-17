@@ -33,7 +33,7 @@ class PlayBlackjack
         int numplayers = Integer.parseInt(args[0]) ;
         int games      = Integer.parseInt(args[1]) ;
 
-        BlackjackRules rules = new BlackjackRules( 6,     // Decks
+        BlackjackRules rules = new BlackjackRules( 8,     // Decks
                                                    true,  // split Aces
                                                    true,  // dealer hit soft 17
                                                    false, // allow surrender
@@ -61,7 +61,7 @@ class PlayBlackjack
         }
 
         Blackjack game = new Blackjack(rules, players) ;
-        //int progressBar = games / 10 ;
+        int progressBar = games / 10 ;
         //System.out.print("progress") ;
         while( games > 0 )
         {
@@ -72,6 +72,8 @@ class PlayBlackjack
             // Comment out until we're done w/ the strategy
             //if(progressBar > 0 && (games % progressBar) == 0 ) System.out.print(".") ;
             --games ;
+            System.out.println("Reshuffling " + games + " left") ;
+
         }
         //System.out.println() ;
         game.printStats() ;

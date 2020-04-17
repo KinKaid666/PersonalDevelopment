@@ -18,6 +18,7 @@ public class Blackjack
     /* stats */
     private int hands_  = 0 ;
     private int wins_   = 0 ;
+    private int BJwins_ = 0 ;
     private int losses_ = 0 ;
     private int pushes_ = 0 ;
 
@@ -108,6 +109,7 @@ public class Blackjack
                                 // one card on double
                                 if(Move.Double == move)
                                 {
+                                    playerHands.get(j).doubleBet() ;
                                     break ;
                                 }
 
@@ -149,38 +151,42 @@ public class Blackjack
                 for(int j = 0 ; j < playerHands.size() ; ++j)
                 {
                     ++hands_ ;
+                    if(playerHands.get(j).isDoubled()) ++hands_ ;
                     System.out.print("        (" + p.getName() + ") (hand " + (j+1) + ") ends with hand : " + playerHands.get(j)) ;
 
-                    // Surrender use case
+                    // TODO: Surrender use case
+                    //       clean up
                     if( playerHands.get(j).busted() )
                     {
                         System.out.println( " : loss (busted)" ) ;
                         ++losses_ ;
+                        if(playerHands.get(j).isDoubled()) ++losses_ ;
                     }
                     else if( dealerHand.busted() )
                     {
                         System.out.println( " : win (dealer busted)" ) ;
                         ++wins_ ;
+                        if(playerHands.get(j).isDoubled()) ++wins_ ;
+                        if(playerHands.get(j).isBlackjack()) ++BJwins_ ;
                     }
                     else if( playerHands.get(j).lessThan(dealerHand))
                     {
                         System.out.println( " : loss" ) ;
                         ++losses_ ;
+                        if(playerHands.get(j).isDoubled()) ++losses_ ;
                     }
                     else if( playerHands.get(j).greaterThan(dealerHand) )
                     {
                         System.out.println( " : win" ) ;
                         ++wins_ ;
+                        if(playerHands.get(j).isDoubled()) ++wins_ ;
+                        if(playerHands.get(j).isBlackjack()) ++BJwins_ ;
                     }
                     else if( playerHands.get(j).equals(dealerHand) )
                     {
                         System.out.println( " : push" ) ;
                         ++pushes_ ;
-                    }
-                    else
-                    {
-                        System.err.println( " : ???" ) ;
-                        System.exit(1) ; // bad
+                        if(playerHands.get(j).isDoubled()) ++pushes_ ;
                     }
                 }
                 ++i ;
@@ -216,9 +222,10 @@ public class Blackjack
     public void printStats()
     {
         System.out.printf("Stats : %,10d hands\n", hands_) ;
-        System.out.printf("      : %,10d losses or %02.2f%%\n",losses_,(losses_*100.0/hands_)) ;
-        System.out.printf("      : %,10d wins   or %02.2f%%\n",wins_,  (wins_  *100.0/hands_)) ;
-        System.out.printf("      : %,10d pushes or %02.2f%%\n",pushes_,(pushes_*100.0/hands_)) ;
+        System.out.printf("      : %,10d losses  or %5.2f%%\n",losses_,(losses_*100.0/hands_)) ;
+        System.out.printf("      : %,10d wins    or %5.2f%%\n",wins_,  (wins_  *100.0/hands_)) ;
+        System.out.printf("      : %,10d were BJ or %5.2f%%\n",BJwins_,(BJwins_*100.0/hands_)) ;
+        System.out.printf("      : %,10d pushes  or %5.2f%%\n",pushes_,(pushes_*100.0/hands_)) ;
     } 
 
 }
