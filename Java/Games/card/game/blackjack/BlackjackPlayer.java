@@ -1,32 +1,40 @@
 package card.game.blackjack ;
 
+import card.Card ;
+import card.game.blackjack.* ;
 public class BlackjackPlayer
 {
     private String            name_ ;
-    private BlackjackRules    rules_ = null ;
     private BlackjackStrategy strategy_ ;
 
     public BlackjackPlayer(String            name,
-                           BlackjackRules    rules,
                            BlackjackStrategy strategy)
     {
         name_ = name ;
-        rules_ = rules ;
         strategy_ = strategy ;
     }
 
-    public Blackjack.Move decision(BlackjackHand hand)
+    public Blackjack.Move getHandDecision(BlackjackRules rules, BlackjackHand hand, Card dealerUpcard)
     {
-        return Blackjack.Move.Stand ;
-    }
-
-    public void setTableRules(BlackjackRules rules)
-    {
-        rules_ = rules ;
+        return strategy_.getHandDecision(rules, hand, dealerUpcard) ;
     }
 
     public String getName()
     {
         return name_ ;
+    }
+
+    /*
+     * Get strategy to clone, for splits hands
+     */
+    public BlackjackStrategy getStrategy()
+    {
+        return strategy_ ;
+    }
+
+    public void printPlayer()
+    {
+        System.out.println("Announcing Player with name '" + name_ + "'") ;
+        strategy_.printStrategy() ;
     }
 }

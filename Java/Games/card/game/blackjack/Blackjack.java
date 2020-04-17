@@ -25,9 +25,10 @@ public class Blackjack
     {
         Hit,
         Stand,
-        DoubleDown,
+        Double,
         Split,
-        Surrender
+        Surrender,
+        Unknown  // Not yet determined
     } ;
 
     public Blackjack(
@@ -35,10 +36,9 @@ public class Blackjack
         List<BlackjackPlayer> players
     )
     {
-        rules_ = rules ;
-        players_ = players ;
+        rules_    = rules ;
+        players_  = players ;
         cardShoe_ = new Shoe(rules.getNumberOfDecks()) ;
-
         cardShoe_.shuffle() ;
     }
 
@@ -46,73 +46,142 @@ public class Blackjack
     {
         while( !cardShoe_.reshuffleNeeded() )
         {
-            BlackjackHand[] hands = deal() ;
-            int i = 0 ;
+            // Deal - will return a hand for each player and the dealer's hand last
+            BlackjackHand[] temphands = deal() ;
 
-            System.out.println("*** (Hand:" + hands_/players_.size() + ") ***") ;
-            System.out.println("    Dealer starts with hand (upcard first): " + hands[hands.length - 1] + " ***" ) ;
-            // Dumb initial version, only see upcard
-            BlackjackHand dealerUpcardHand = new BlackjackHand() ;
-            dealerUpcardHand.add(hands[hands.length-1].getCard(0)) ;
-            for( BlackjackPlayer p : players_ )
+            // Take the hands and get them read to play
+            //    Last hand is the dealers
+            //    Then each player need a list of hands for if/when they split
+            BlackjackHand dealerHand = temphands[temphands.length-1] ;
+            List<List<BlackjackHand>> hands = new LinkedList<List<BlackjackHand>>() ;
+            for(int i = 0 ; i < temphands.length-1 ; ++i)
             {
-                System.out.println("    (" + p.getName() + ") starts with hand : " + hands[i]) ;
+                hands.add(new LinkedList<BlackjackHand>()) ;
+                hands.get(i).add(temphands[i]) ;
+            }
 
+            System.out.println("*** (Hand:" + ((hands_/players_.size())+1) + ") ***") ;
+            System.out.println("    Dealer starts with hand (upcard first): " + dealerHand + " ***" ) ;
 
-                //
-                // TODO: Add strategy object
-                // while( STAND != p.determineMove(hands[i],dealerUpcardHand) &&
-                //        !hand[i].busted()
-                while( hands[i].getHandValue() < 17 && dealerUpcardHand.getHandValue() >= 7)
+            Card dealerUpcard = dealerHand.getCard(0) ;
+
+            // TODO: dealer Insurance
+            boolean playersLeft = false ;
+
+            if( dealerHand.getHandValue() != 21 )
+            {
+                // Index into our player and hand outter array
+                int i = 0 ;
+                for( BlackjackPlayer p : players_ )
                 {
-                    hands[i].add(cardShoe_.getNextCard()) ;
+                    System.out.println("    (" + p.getName() + ") starts with hand : " + hands.get(i).get(0)) ;
+
+                    List<BlackjackHand> playerHands = hands.get(i) ;
+                    for(int j = 0 ; j < playerHands.size() ; ++j)
+                    {
+                        // Determine the move
+                        Blackjack.Move move = p.getHandDecision(rules_,playerHands.get(j),dealerUpcard) ;
+
+                        System.out.print("        ... move = " + move) ;
+
+                        // Split
+                        //   replace the current hand w/ two hands and go again
+                        if(Move.Split == move)
+                        {
+                            BlackjackHand toBeSplitHand = playerHands.remove(j) ;
+                            BlackjackHand[] splitHands = new BlackjackHand[2] ;
+                            splitHands[0] = new BlackjackHand(toBeSplitHand.getCard(0),cardShoe_.getNextCard()) ;
+                            splitHands[1] = new BlackjackHand(toBeSplitHand.getCard(1),cardShoe_.getNextCard()) ;
+                            playerHands.add(j,splitHands[0]) ;
+                            playerHands.add(j,splitHands[1]) ;
+                            --j ;
+                            System.out.println() ;
+                        }
+                        else
+                        {
+                            while(Move.Surrender != move && Move.Stand != move && !playerHands.get(j).busted())
+                            {
+                                Card hit = cardShoe_.getNextCard() ;
+                                System.out.println(" got : " + hit) ;
+                                playerHands.get(j).add(hit) ;
+
+                                // one card on double
+                                if(Move.Double == move)
+                                {
+                                    break ;
+                                }
+
+                                // if we didn't bust, get another card
+                                if(!playerHands.get(j).busted())
+                                {
+                                    move = p.getHandDecision(rules_,playerHands.get(j),dealerUpcard) ;
+                                    System.out.print("        ... move = " + move) ;
+                                }
+                            }
+                            if(Move.Stand == move || Move.Surrender == move)
+                                System.out.println() ;
+                            System.out.println("        => ending hand value: " + playerHands.get(j).getHandValue() + (playerHands.get(j).busted()? " BUSTED":"")) ;
+
+                            if(Move.Surrender != move && !playerHands.get(j).busted())
+                            {
+                                playersLeft = true ;
+                            }
+                        }
+                    }
+                    ++i ;
                 }
-                ++i ;
             }
 
             //
             // Dealer hitting
-            //   TODO: if everyone busted, don't draw
-            while( hands[hands.length-1].getHandValue() < 17 ||
-                   (hands[hands.length-1].getHandValue() == 17 && hands[hands.length-1].isSoft()) && rules_.getDealerHitSoft17())
+            while( playersLeft &&
+                   dealerHand.getHandValue() < 17 ||
+                   (dealerHand.getHandValue() == 17 && dealerHand.isSoft()) && rules_.getDealerHitSoft17())
             {
-                hands[hands.length-1].add(cardShoe_.getNextCard()) ;
+                dealerHand.add(cardShoe_.getNextCard()) ;
             }
-            i = 0 ;
-            System.out.println("    *** Dealer ends with hand : " + hands[hands.length - 1] + " ***" ) ;
+            int i = 0 ;
+            System.out.println("    *** Dealer ends with hand : " + dealerHand + " ***" ) ;
             for( BlackjackPlayer p : players_ )
             {
-                ++hands_ ;
-                System.out.print("        (" + p.getName() + ") ends with hand : " + hands[i]) ;
-                if( hands[i].busted() )
+
+                List<BlackjackHand> playerHands = hands.get(i) ;
+                for(int j = 0 ; j < playerHands.size() ; ++j)
                 {
-                    System.out.println( " : loss (busted)" ) ;
-                    ++losses_ ;
-                }
-                else if( hands[hands.length-1].busted() )
-                {
-                    System.out.println( " : win (dealer busted)" ) ;
-                    ++wins_ ;
-                }
-                else if( hands[i].lessThan(hands[hands.length-1]))
-                {
-                    System.out.println( " : loss" ) ;
-                    ++losses_ ;
-                }
-                else if( hands[i].greaterThan(hands[hands.length-1]) )
-                {
-                    System.out.println( " : win" ) ;
-                    ++wins_ ;
-                }
-                else if( hands[i].equals(hands[hands.length-1]) )
-                {
-                    System.out.println( " : push" ) ;
-                    ++pushes_ ;
-                }
-                else
-                {
-                    System.err.println( " : ???" ) ;
-                    System.exit(1) ; // bad
+                    ++hands_ ;
+                    System.out.print("        (" + p.getName() + ") (hand " + (j+1) + ") ends with hand : " + playerHands.get(j)) ;
+
+                    // Surrender use case
+                    if( playerHands.get(j).busted() )
+                    {
+                        System.out.println( " : loss (busted)" ) ;
+                        ++losses_ ;
+                    }
+                    else if( dealerHand.busted() )
+                    {
+                        System.out.println( " : win (dealer busted)" ) ;
+                        ++wins_ ;
+                    }
+                    else if( playerHands.get(j).lessThan(dealerHand))
+                    {
+                        System.out.println( " : loss" ) ;
+                        ++losses_ ;
+                    }
+                    else if( playerHands.get(j).greaterThan(dealerHand) )
+                    {
+                        System.out.println( " : win" ) ;
+                        ++wins_ ;
+                    }
+                    else if( playerHands.get(j).equals(dealerHand) )
+                    {
+                        System.out.println( " : push" ) ;
+                        ++pushes_ ;
+                    }
+                    else
+                    {
+                        System.err.println( " : ???" ) ;
+                        System.exit(1) ; // bad
+                    }
                 }
                 ++i ;
             }

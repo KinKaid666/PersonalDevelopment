@@ -3,6 +3,7 @@ package card.game.blackjack ;
 import java.util.List ;
 import java.util.LinkedList ;
 
+import card.game.blackjack.* ;
 import card.Card ;
 
 class PlayBlackjack
@@ -46,7 +47,16 @@ class PlayBlackjack
         List<BlackjackPlayer> players = new LinkedList<BlackjackPlayer>() ;
         for( int i = 0 ; i < numplayers ; ++i )
         {
-            BlackjackPlayer p = new BlackjackPlayer("Player " + i, rules, new BlackjackStrategy()) ;
+            BlackjackPlayer p = null ;
+            try
+            {
+                p = new BlackjackPlayer("Player " + i, BlackjackStrategy.createStrategyFromFile("/Users/ericferguson/Development/Java/Games/card/game/blackjack/Strategies/default.stg")) ;
+            }
+            catch (Exception e)
+            {
+                System.err.println(e.getMessage()) ;
+                System.exit(1) ;
+            }
             players.add(p) ;
         }
 
@@ -63,7 +73,7 @@ class PlayBlackjack
             //if(progressBar > 0 && (games % progressBar) == 0 ) System.out.print(".") ;
             --games ;
         }
-        System.out.println() ;
+        //System.out.println() ;
         game.printStats() ;
     }
 }

@@ -7,12 +7,15 @@ import java.util.List ;
 
 public class BlackjackHand
 {
+
+    private Integer bet_     = null ;
+    private boolean doubled_ = false ;
     public enum Outcome
     {
         Win,
         Loss,
         Push
-    }
+    } ;
 
     public enum BlackjackHandValue
     {
@@ -57,9 +60,16 @@ public class BlackjackHand
 
     private List<Card> cardsInHand_ = null ;
 
+    /* Non-gambling constructor */
     public BlackjackHand()
     {
         cardsInHand_ = new LinkedList<Card>() ;
+    }
+
+    public BlackjackHand( int bet )
+    {
+        cardsInHand_ = new LinkedList<Card>() ;
+        bet_ = bet ;
     }
 
     public BlackjackHand(Card one, Card two)
@@ -77,6 +87,11 @@ public class BlackjackHand
     public Card getCard(int card)
     {
         return cardsInHand_.get(card) ;
+    }
+
+    public boolean isPair()
+    {
+        return cardsInHand_.size() == 2 && cardsInHand_.get(0).getRank() == cardsInHand_.get(1).getRank() ;
     }
 
     public void add(Card card)
@@ -115,16 +130,24 @@ public class BlackjackHand
         return compareTo(other) == 0 ;
     }
 
+    /*
+     * it's soft when one of the aces is counting for 10
+     *    -> need 1 or more aces
+     *    -> need only 1 ace being worth more than 1
+     */
     public boolean isSoft()
     {
+        int valMinusAces = getHandValueMinusAces() ;
+        int valWithAces  = getHandValue() ;
+        int numAces      = 0 ;
         for( Card c : cardsInHand_ )
         {
             if(c.getRank() == Card.Rank.Ace )
             {
-                return true ;
+                ++numAces ;
             }
         }
-        return false ;
+        return (numAces > 0) && !(valWithAces == (valMinusAces + numAces)) ;
     }
 
     /*
@@ -199,6 +222,8 @@ public class BlackjackHand
 
     /*
      * getHandValue is used when determining the value of the hand for comparison purposes
+     *   hand Value is always the closet to 21 without going over;
+     *   therefor always 17 and never 7 when it's A-6
      */
     public int getHandValue()
     {
@@ -254,6 +279,69 @@ public class BlackjackHand
         }
         return value ;
     }
+
+    /*
+     * getHandValue is used when determining the value of the hand for comparison purposes
+     */
+    private int getHandValueMinusAces()
+    {
+        int value = 0 ;
+        for( Card c : cardsInHand_ )
+        {
+            switch( c.getRank() )
+            {
+            case Ace:
+                break ;
+            case Deuce:
+                value += 2 ;
+                break ;
+            case Three:
+                value += 3 ;
+                break ;
+            case Four:
+                value += 4 ;
+                break ;
+            case Five:
+                value += 5 ;
+                break ;
+            case Six:
+                value += 6 ;
+                break ;
+            case Seven:
+                value += 7 ;
+                break ;
+            case Eight:
+                value += 8 ;
+                break ;
+            case Nine:
+                value += 9 ;
+                break ;
+            case Ten:
+            case Jack:
+            case Queen:
+            case King:
+                value += 10 ;
+                break ;
+            default:
+                System.err.println("Unknown card : " + c) ;
+                System.exit(1) ;
+            }
+        }
+        return value ;
+    }
+
+    public void doubleBet()
+    {
+        if( bet_ != null )
+        {
+            bet_ *= 2 ;
+        }
+        doubled_ = true ;
+    }
+
+    /* Getters */
+    public boolean isDoubled() { return doubled_ ; }
+    public int     bet()       { return bet_     ; }
 
     public String toString()
     {
