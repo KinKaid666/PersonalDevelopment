@@ -206,7 +206,6 @@ public class BlackjackStatistics
             System.out.printf("        Weighted Net    =   %,10.1f / %5.1f%%\n", (handTotal.weightedwins_ - handTotal.weightedlosses_), (handTotal.occurrences_ > 0 ? (handTotal.weightedwins_ - handTotal.weightedlosses_)*100.0 / handTotal.occurrences_ : 0) ) ;
 
 
-            System.out.printf("        ASDF %s Weighted Net = %,5.1f / %5.1f%%\n", k1, (handTotal.weightedwins_ - handTotal.weightedlosses_), (handTotal.occurrences_ > 0 ? (handTotal.weightedwins_ - handTotal.weightedlosses_)*100.0 / handTotal.occurrences_ : 0) ) ;
         }
         System.out.println("TOTALS") ;
         System.out.printf("    Frequency       = %,10d\n", totals.occurrences_   ) ;
