@@ -25,18 +25,25 @@ class PlayBlackjack
         System.out.println(h) ;
         */
 
-        if(args.length != 3)
+        if(!(args.length == 3 || args.length == 4))
         {
-            System.err.println("usage: " + System.getProperty("sun.java.command") + " <number of players> <number of shuffles> <strategy filename") ;
+            System.err.println("usage: " + System.getProperty("sun.java.command") + " <number of players> <number of shuffles> <strategy filename> [verbose: 1 or default:0]") ;
             System.exit(1) ;
         }
         int numplayers = Integer.parseInt(args[0]) ;
         int games      = Integer.parseInt(args[1]) ;
+        String strategy = args[2] ;
+        boolean verbose = false ;
+
+        if(args.length == 4 && Integer.parseInt(args[3]) == 1)
+        {
+            verbose = true ;
+        }
 
         BlackjackRules rules = new BlackjackRules( 8,     // Decks
                                                    true,  // split Aces
                                                    true,  // dealer hit soft 17
-                                                   false, // allow surrender
+                                                   true,  // allow surrender
                                                    false, // allow late surrender
                                                    true,  // replit pairs
                                                    false, // resplit aces
@@ -48,7 +55,10 @@ class PlayBlackjack
         try
         {
             s = BlackjackStrategy.createStrategyFromFile(args[2]) ;
-            //s.printStrategy() ;
+            if(verbose)
+            {
+                s.printStrategy() ;
+            }
         }
         catch (Exception e)
         {
@@ -63,7 +73,7 @@ class PlayBlackjack
         }
 
         Blackjack game = new Blackjack(rules, players) ;
-        //game.setVerbose(true) ;
+        game.setVerbose(verbose) ;
         int progressBar = games / 10 ;
         //System.out.print("progress") ;
         while( games > 0 )
@@ -87,7 +97,10 @@ class PlayBlackjack
             //System.out.println("Reshuffling " + games + " left") ;
 
         }
-        //s.printStatistics() ;
+        if(verbose)
+        {
+            s.printStatistics() ;
+        }
         s.printStatisticsCSV() ;
     }
 }
