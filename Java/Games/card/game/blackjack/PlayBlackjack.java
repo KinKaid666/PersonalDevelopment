@@ -25,9 +25,9 @@ class PlayBlackjack
         System.out.println(h) ;
         */
 
-        if(args.length != 2)
+        if(args.length != 3)
         {
-            System.err.println("usage: " + System.getProperty("sun.java.command") + " <number of players> <number of shuffles>") ;
+            System.err.println("usage: " + System.getProperty("sun.java.command") + " <number of players> <number of shuffles> <strategy filename") ;
             System.exit(1) ;
         }
         int numplayers = Integer.parseInt(args[0]) ;
@@ -47,7 +47,7 @@ class PlayBlackjack
         BlackjackStrategy s = null ;
         try
         {
-            s = BlackjackStrategy.createStrategyFromFile("/Users/ericferguson/Development/Java/Games/card/game/blackjack/Strategies/perfect.stg") ;
+            s = BlackjackStrategy.createStrategyFromFile(args[2]) ;
             //s.printStrategy() ;
         }
         catch (Exception e)
