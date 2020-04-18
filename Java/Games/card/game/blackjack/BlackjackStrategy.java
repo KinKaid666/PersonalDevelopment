@@ -4,6 +4,7 @@ import java.lang.Exception ;
 import java.io.* ;
 import java.util.HashMap ;
 import java.util.Map ;
+import java.util.List ;
 import card.game.blackjack.* ;
 import card.Card ;
 
@@ -31,6 +32,8 @@ import card.Card ;
 // TODO: store each filename into a has so we don't re-create each object
 public class BlackjackStrategy
 {
+    /* keeping the stats tied to the statistics */
+    private BlackjackStatistics stats_ = new BlackjackStatistics() ;
     private static Map<String, BlackjackStrategy> strategies_ = new HashMap<String,BlackjackStrategy>() ;
 
     private final static String      PAIRS_STRING = "Pairs"    ;
@@ -50,7 +53,6 @@ public class BlackjackStrategy
     {
         Hit,
         Stand,
-        Double,
         DoubleElseHit,
         DoubleElseStand,
         Split,
@@ -81,6 +83,21 @@ public class BlackjackStrategy
         takeEvenMoney_ = takeEvenMoney ;
     }
 
+    /*
+     * Forwarding functions to the statistics helper class
+     */
+    public void recordHandList(List<BlackjackHand> handList, Card c, List<BlackjackHand.Outcome> outcomes, double[] weights) throws Exception
+    {
+        stats_.recordHandList(handList, c, outcomes, weights) ;
+    }
+
+    /* Forwarding functions */
+    public void printStatistics()    { stats_.printStatistics()    ; }
+    public void printStatisticsCSV() { stats_.printStatisticsCSV() ; }
+
+    /*
+     * Printing function
+     */
     public void printStrategy()
     {
         System.out.println("*** Dumping Configuration" ) ;
@@ -107,7 +124,7 @@ public class BlackjackStrategy
         }
     }
 
-    public Blackjack.Move getHandDecision(BlackjackRules r, BlackjackHand h, Card dealerUpcard)
+    public Blackjack.Move getHandDecision(BlackjackRules r, BlackjackHand h, Card dealerUpcard) throws Exception
     {
         Blackjack.Move move = Blackjack.Move.Unknown ;
 
@@ -204,27 +221,35 @@ public class BlackjackStrategy
             }
         }
 
+        // Then hard totals
         if(Blackjack.Move.Unknown == move)
 
         {
-            // Then hard totals
             BlackjackStrategy.StrategicMove m = hardTotalStrategies_.get(h.getHandValue()).get(normalizedDealerUpcard) ;
             switch(m)
             {
                 case Hit:
                     move = Blackjack.Move.Hit ;
                     break ;
-                // TODO: Check rules
                 case Stand:
                     move = Blackjack.Move.Stand ;
                     break ;
-                // TODO: Check rules
-                case Double:
-                case DoubleElseStand:
                 case DoubleElseHit:
-                    move = Blackjack.Move.Double ;
+                    if(h.cardCount() == 2)
+                    {
+                        move = Blackjack.Move.Double ;
+                    }
+                    else
+                    {
+                        move = Blackjack.Move.Hit ;
+                    }
                     break ;
             }
+        }
+
+        if(Blackjack.Move.Unknown == move)
+        {
+            throw new Exception("Don't know what to do with " + h + " against a dealer upcard of " + dealerUpcard) ;
         }
         return move ;
     }

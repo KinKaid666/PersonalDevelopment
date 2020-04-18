@@ -14,7 +14,7 @@ public class BlackjackPlayer
         strategy_ = strategy ;
     }
 
-    public Blackjack.Move getHandDecision(BlackjackRules rules, BlackjackHand hand, Card dealerUpcard)
+    public Blackjack.Move getHandDecision(BlackjackRules rules, BlackjackHand hand, Card dealerUpcard) throws Exception
     {
         return strategy_.getHandDecision(rules, hand, dealerUpcard) ;
     }

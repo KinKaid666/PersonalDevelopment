@@ -28,7 +28,6 @@ public class BJStrategyTest
             BlackjackStrategy s = BlackjackStrategy.createStrategyFromFile( args[0] ) ;
             s.printStrategy() ;
 
-
             Card ace = Card.valueOf(Card.Rank.Ace,Card.Suit.Hearts) ;
             Card three = Card.valueOf(Card.Rank.Three,Card.Suit.Hearts) ;
             Card eight = Card.valueOf(Card.Rank.Eight,Card.Suit.Hearts) ;

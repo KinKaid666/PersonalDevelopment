@@ -11,16 +11,13 @@ import java.util.LinkedList ;
 public class Blackjack
 {
 
+    /* Playing objects */
     private BlackjackRules        rules_         = null ;
     private List<BlackjackPlayer> players_       = null ;
     private Shoe                  cardShoe_      = null ;
 
-    /* stats */
-    private int hands_  = 0 ;
-    private int wins_   = 0 ;
-    private int BJwins_ = 0 ;
-    private int losses_ = 0 ;
-    private int pushes_ = 0 ;
+    private boolean verbose_ = false ;
+    private int     hands_   = 0 ;
 
     public enum Move
     {
@@ -43,7 +40,9 @@ public class Blackjack
         cardShoe_.shuffle() ;
     }
 
-    public void play()
+    public void setVerbose(boolean verbose) { verbose_ = verbose ; }
+
+    public void play() throws Exception
     {
         while( !cardShoe_.reshuffleNeeded() )
         {
@@ -61,8 +60,11 @@ public class Blackjack
                 hands.get(i).add(temphands[i]) ;
             }
 
-            System.out.println("*** (Hand:" + ((hands_/players_.size())+1) + ") ***") ;
-            System.out.println("    Dealer starts with hand (upcard first): " + dealerHand + " ***" ) ;
+            if(verbose_)
+            {
+                System.out.println("*** (Hand:" + (hands_+1) + ") ***") ;
+                System.out.println("    Dealer starts with hand (upcard first): " + dealerHand + " ***" ) ;
+            }
 
             Card dealerUpcard = dealerHand.getCard(0) ;
 
@@ -75,7 +77,10 @@ public class Blackjack
                 int i = 0 ;
                 for( BlackjackPlayer p : players_ )
                 {
-                    System.out.println("    (" + p.getName() + ") starts with hand : " + hands.get(i).get(0)) ;
+                    if(verbose_)
+                    {
+                        System.out.println("    (" + p.getName() + ") starts with hand : " + hands.get(i).get(0)) ;
+                    }
 
                     List<BlackjackHand> playerHands = hands.get(i) ;
                     for(int j = 0 ; j < playerHands.size() ; ++j)
@@ -83,7 +88,10 @@ public class Blackjack
                         // Determine the move
                         Blackjack.Move move = p.getHandDecision(rules_,playerHands.get(j),dealerUpcard) ;
 
-                        System.out.print("        ... move = " + move) ;
+                        if(verbose_)
+                        {
+                            System.out.print("        ... move = " + move) ;
+                        }
 
                         // Split
                         //   replace the current hand w/ two hands and go again
@@ -93,17 +101,29 @@ public class Blackjack
                             BlackjackHand[] splitHands = new BlackjackHand[2] ;
                             splitHands[0] = new BlackjackHand(toBeSplitHand.getCard(0),cardShoe_.getNextCard()) ;
                             splitHands[1] = new BlackjackHand(toBeSplitHand.getCard(1),cardShoe_.getNextCard()) ;
-                            playerHands.add(j,splitHands[0]) ;
-                            playerHands.add(j,splitHands[1]) ;
+                            playerHands.add(j,  splitHands[0]) ;
+                            playerHands.add(j+1,splitHands[1]) ;
                             --j ;
-                            System.out.println() ;
+
+                            if(verbose_)
+                            {
+                                System.out.println() ;
+                                System.out.println("    (" + p.getName() + ") split resulted with (hand 1) : " + splitHands[0]) ;
+                                System.out.println("    (" + p.getName() + ") split resulted with (hand 2) : " + splitHands[1]) ;
+                            }
                         }
                         else
                         {
-                            while(Move.Surrender != move && Move.Stand != move && !playerHands.get(j).busted())
+                            while(Move.Unknown   != move &&
+                                  Move.Surrender != move &&
+                                  Move.Stand     != move &&
+                                  !playerHands.get(j).isBusted())
                             {
                                 Card hit = cardShoe_.getNextCard() ;
-                                System.out.println(" got : " + hit) ;
+                                if(verbose_)
+                                {
+                                    System.out.println(" got : " + hit) ;
+                                }
                                 playerHands.get(j).add(hit) ;
 
                                 // one card on double
@@ -114,17 +134,32 @@ public class Blackjack
                                 }
 
                                 // if we didn't bust, get another card
-                                if(!playerHands.get(j).busted())
+                                if(!playerHands.get(j).isBusted())
                                 {
                                     move = p.getHandDecision(rules_,playerHands.get(j),dealerUpcard) ;
-                                    System.out.print("        ... move = " + move) ;
+                                    if(verbose_)
+                                    {
+                                        System.out.print("        ... move = " + move) ;
+                                    }
                                 }
                             }
-                            if(Move.Stand == move || Move.Surrender == move)
-                                System.out.println() ;
-                            System.out.println("        => ending hand value: " + playerHands.get(j).getHandValue() + (playerHands.get(j).busted()? " BUSTED":"")) ;
+                            if(Move.Surrender == move)
+                            {
+                                playerHands.get(j).surrender() ;
+                            }
+                            if(verbose_)
+                            {
+                                if(Move.Stand == move || Move.Surrender == move)
+                                {
+                                    System.out.println() ;
+                                }
+                            }
+                            if(verbose_)
+                            {
+                                System.out.println("        => ending hand value: " + playerHands.get(j).getHandValue() + (playerHands.get(j).isBusted()? " BUSTED":"")) ;
+                            }
 
-                            if(Move.Surrender != move && !playerHands.get(j).busted())
+                            if(Move.Surrender != move && !playerHands.get(j).isBusted())
                             {
                                 playersLeft = true ;
                             }
@@ -142,57 +177,68 @@ public class Blackjack
             {
                 dealerHand.add(cardShoe_.getNextCard()) ;
             }
+
+            //
+            // Record the outcome
+            if(verbose_)
+            {
+                System.out.println("    *** Dealer ends with hand : " + dealerHand + " ***" ) ;
+            }
             int i = 0 ;
-            System.out.println("    *** Dealer ends with hand : " + dealerHand + " ***" ) ;
             for( BlackjackPlayer p : players_ )
             {
 
                 List<BlackjackHand> playerHands = hands.get(i) ;
+                List<BlackjackHand.Outcome> outcomes = new LinkedList<BlackjackHand.Outcome>() ;
+                double[] weights = new double[playerHands.size()] ;
                 for(int j = 0 ; j < playerHands.size() ; ++j)
                 {
-                    ++hands_ ;
-                    if(playerHands.get(j).isDoubled()) ++hands_ ;
-                    System.out.print("        (" + p.getName() + ") (hand " + (j+1) + ") ends with hand : " + playerHands.get(j)) ;
+                    BlackjackHand.Outcome o = determineOutcome(playerHands.get(j),dealerHand) ;
+                    if(verbose_)
+                    {
+                        System.out.println("        (" + p.getName() + ") (hand " + (j+1) + ") ends with hand : " + playerHands.get(j) + " : " + o) ;
+                    }
 
-                    // TODO: Surrender use case
-                    //       clean up
-                    if( playerHands.get(j).busted() )
+                    // Add outcomes to a list so we can get good statistics
+                    outcomes.add(o) ;
+
+                    // Weight is 2   for all doubled hands
+                    //           1.5 for all blackjacks
+                    //           1   for all others
+                    weights[j] = (playerHands.get(j).isDoubled() ? 2 : 1) ;
+
+                    // Only get 3:2 on starting hands
+                    if(playerHands.get(j).isBlackjack() &&
+                       !dealerHand.isBlackjack()        &&
+                       playerHands.size() == 1)
                     {
-                        System.out.println( " : loss (busted)" ) ;
-                        ++losses_ ;
-                        if(playerHands.get(j).isDoubled()) ++losses_ ;
-                    }
-                    else if( dealerHand.busted() )
-                    {
-                        System.out.println( " : win (dealer busted)" ) ;
-                        ++wins_ ;
-                        if(playerHands.get(j).isDoubled()) ++wins_ ;
-                        if(playerHands.get(j).isBlackjack()) ++BJwins_ ;
-                    }
-                    else if( playerHands.get(j).lessThan(dealerHand))
-                    {
-                        System.out.println( " : loss" ) ;
-                        ++losses_ ;
-                        if(playerHands.get(j).isDoubled()) ++losses_ ;
-                    }
-                    else if( playerHands.get(j).greaterThan(dealerHand) )
-                    {
-                        System.out.println( " : win" ) ;
-                        ++wins_ ;
-                        if(playerHands.get(j).isDoubled()) ++wins_ ;
-                        if(playerHands.get(j).isBlackjack()) ++BJwins_ ;
-                    }
-                    else if( playerHands.get(j).equals(dealerHand) )
-                    {
-                        System.out.println( " : push" ) ;
-                        ++pushes_ ;
-                        if(playerHands.get(j).isDoubled()) ++pushes_ ;
+                        weights[j] = 1.5 ;
                     }
                 }
+                // record the outcome
+                p.getStrategy().recordHandList(playerHands,dealerHand.getCard(0),outcomes,weights) ;
                 ++i ;
             }
-            System.out.println() ;
+            if(verbose_)
+            {
+                System.out.println() ;
+            }
+            hands_++ ;
         }
+    }
+
+    private static BlackjackHand.Outcome determineOutcome(BlackjackHand player, BlackjackHand dealer)
+    {
+        BlackjackHand.Outcome o = BlackjackHand.Outcome.Push ;
+        if( player.isSurrendered() || player.isBusted() || (!dealer.isBusted() && dealer.greaterThan(player)))
+        {
+            o = BlackjackHand.Outcome.Loss ;
+        }
+        else if( (player.isBlackjack() && !dealer.isBlackjack()) || dealer.isBusted() || dealer.lessThan(player))
+        {
+            o = BlackjackHand.Outcome.Win ;
+        }
+        return o ;
     }
 
     /*
@@ -218,14 +264,4 @@ public class Blackjack
     {
         cardShoe_.reshuffle() ;
     }
-
-    public void printStats()
-    {
-        System.out.printf("Stats : %,10d hands\n", hands_) ;
-        System.out.printf("      : %,10d losses  or %5.2f%%\n",losses_,(losses_*100.0/hands_)) ;
-        System.out.printf("      : %,10d wins    or %5.2f%%\n",wins_,  (wins_  *100.0/hands_)) ;
-        System.out.printf("      : %,10d were BJ or %5.2f%%\n",BJwins_,(BJwins_*100.0/hands_)) ;
-        System.out.printf("      : %,10d pushes  or %5.2f%%\n",pushes_,(pushes_*100.0/hands_)) ;
-    } 
-
 }

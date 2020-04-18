@@ -44,38 +44,50 @@ class PlayBlackjack
                                                    false, // double on only 10 or 11
                                                    true   // insurance
                                                 ) ;
+        BlackjackStrategy s = null ;
+        try
+        {
+            s = BlackjackStrategy.createStrategyFromFile("/Users/ericferguson/Development/Java/Games/card/game/blackjack/Strategies/perfect.stg") ;
+            //s.printStrategy() ;
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage()) ;
+            System.exit(1) ;
+        }
         List<BlackjackPlayer> players = new LinkedList<BlackjackPlayer>() ;
         for( int i = 0 ; i < numplayers ; ++i )
         {
-            BlackjackPlayer p = null ;
+            BlackjackPlayer p = new BlackjackPlayer("Player " + i, s) ;
+            players.add(p) ;
+        }
+
+        Blackjack game = new Blackjack(rules, players) ;
+        //game.setVerbose(true) ;
+        int progressBar = games / 10 ;
+        //System.out.print("progress") ;
+        while( games > 0 )
+        {
             try
             {
-                p = new BlackjackPlayer("Player " + i, BlackjackStrategy.createStrategyFromFile("/Users/ericferguson/Development/Java/Games/card/game/blackjack/Strategies/perfect.stg")) ;
+                game.play() ;
+                game.shuffle() ;
             }
             catch (Exception e)
             {
                 System.err.println(e.getMessage()) ;
                 System.exit(1) ;
             }
-            players.add(p) ;
-        }
 
-        Blackjack game = new Blackjack(rules, players) ;
-        int progressBar = games / 10 ;
-        //System.out.print("progress") ;
-        while( games > 0 )
-        {
-            game.play() ;
-            game.shuffle() ;
 
             // Progress Bar
             // Comment out until we're done w/ the strategy
             //if(progressBar > 0 && (games % progressBar) == 0 ) System.out.print(".") ;
             --games ;
-            System.out.println("Reshuffling " + games + " left") ;
+            //System.out.println("Reshuffling " + games + " left") ;
 
         }
-        //System.out.println() ;
-        game.printStats() ;
+        //s.printStatistics() ;
+        s.printStatisticsCSV() ;
     }
 }

@@ -8,8 +8,9 @@ import java.util.List ;
 public class BlackjackHand
 {
 
-    private Integer bet_     = null ;
-    private boolean doubled_ = false ;
+    private Integer bet_         = null ;
+    private boolean doubled_     = false ;
+    private boolean surrendered_ = false ;
     public enum Outcome
     {
         Win,
@@ -54,6 +55,7 @@ public class BlackjackHand
         PairOfEights,
         PairOfNines,
         PairOfTens,
+        PairOfAces,
         Blackjack,
         Busted
     } ;
@@ -110,7 +112,7 @@ public class BlackjackHand
         return -1 ;
     }
 
-    public boolean busted()
+    public boolean isBusted()
     {
         return getHandValue() > 21 ;
     }
@@ -184,6 +186,7 @@ public class BlackjackHand
                 return BlackjackHandValue.Eleven ;
             case 12:
                 if(cardsInHand_.size() == 2 && cardsInHand_.get(0).getRank() == Card.Rank.Six ) return BlackjackHandValue.PairOfSixes ;
+                if( cardsInHand_.size() == 2 && isSoft() ) return BlackjackHandValue.PairOfAces ;
                 if( isSoft() ) return BlackjackHandValue.SoftTwelve ;
                 return BlackjackHandValue.Twelve ;
             case 13:
@@ -335,6 +338,7 @@ public class BlackjackHand
         return value ;
     }
 
+    /* Setters */
     public void doubleBet()
     {
         if( bet_ != null )
@@ -344,9 +348,12 @@ public class BlackjackHand
         doubled_ = true ;
     }
 
+    public void surrender() { surrendered_ = true ; }
+
     /* Getters */
-    public boolean isDoubled() { return doubled_ ; }
-    public int     bet()       { return bet_     ; }
+    public boolean isSurrendered() { return surrendered_ ; }
+    public boolean isDoubled()     { return doubled_     ; }
+    public int     bet()           { return bet_         ; }
 
     public String toString()
     {
