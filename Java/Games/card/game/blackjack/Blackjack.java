@@ -214,6 +214,12 @@ public class Blackjack
                     {
                         weights[j] = 1.5 ;
                     }
+
+                    if(playerHands.get(j).isSurrendered())
+                    {
+                        weights[j] = 0.5 ;
+                    }
+
                 }
                 // record the outcome
                 p.getStrategy().recordHandList(playerHands,dealerHand.getCard(0),outcomes,weights) ;
