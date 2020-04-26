@@ -141,15 +141,12 @@ public class BlackjackStrategy
         }
         //System.out.print("        ...getHandDecision( hand = " + h.getHandValue() + ", dealer upcard = " + normalizedDealerUpcard + ") = " ) ;
 
-        // Determine if we should surrender
-        if(r.getAllowSurrender() &&
+        // Early surrender is before the dealer checks their hold card; skipped
+        // Late surrender is after the dealer checks their hold card.
+        if(!h.isPair() && r.getAllowLateSurrender() &&
            surrenderStrategies_.get(h.getHandValue()).get(normalizedDealerUpcard) == BlackjackStrategy.StrategicMove.Surrender)
         {
             if(h.cardCount() == 2)
-            {
-                move = Blackjack.Move.Surrender ;
-            }
-            else if(h.cardCount() > 2 && r.getAllowLateSurrender())
             {
                 move = Blackjack.Move.Surrender ;
             }
