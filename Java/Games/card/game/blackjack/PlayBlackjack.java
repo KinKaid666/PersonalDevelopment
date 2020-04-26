@@ -27,7 +27,7 @@ class PlayBlackjack
 
         if(!(args.length == 3 || args.length == 4))
         {
-            System.err.println("usage: " + System.getProperty("sun.java.command") + " <number of players> <number of shuffles> <strategy filename> [verbose: 1 or default:0]") ;
+            System.err.println("usage: java " + System.getProperty("sun.java.command").split(" ")[0] + " <number of players> <number of shuffles> <strategy filename> [verbose: 1 or default:0]") ;
             System.exit(1) ;
         }
         int numplayers = Integer.parseInt(args[0]) ;
