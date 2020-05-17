@@ -170,13 +170,13 @@ public class BlackjackStatistics
                 BlackjackStatisticsInfo i = stats_.get(k1).get(k2) ;
                 System.out.println("    Starting hand " + k1 + " against dealer upcard " + k2) ;
                 System.out.printf("        Frequency       = %,10d\n", i.occurrences_) ;
-                System.out.printf("        Wins            = %,10d   / %5.1f%%\n",  i.wins_          , (i.occurrences_ > 0 ? i.wins_          *100.0 / i.occurrences_ : 0) ) ;
-                System.out.printf("        Losses          = %,10d   / %5.1f%%\n",  i.losses_        , (i.occurrences_ > 0 ? i.losses_        *100.0 / i.occurrences_ : 0) ) ;
-                System.out.printf("        Pushes          = %,10d   / %5.1f%%\n",  i.pushes_        , (i.occurrences_ > 0 ? i.pushes_        *100.0 / i.occurrences_ : 0) ) ;
-                System.out.printf("        Weighted Wins   =   %,10.1f / %5.1f%%\n", i.weightedwins_  , (i.occurrences_ > 0 ? i.weightedwins_  *100.0 / i.occurrences_ : 0) ) ;
-                System.out.printf("        Weighted Losses =   %,10.1f / %5.1f%%\n", i.weightedlosses_, (i.occurrences_ > 0 ? i.weightedlosses_*100.0 / i.occurrences_ : 0) ) ;
-                System.out.printf("        Weighted Pushes =   %,10.1f / %5.1f%%\n", i.weightedpushes_, (i.occurrences_ > 0 ? i.weightedpushes_*100.0 / i.occurrences_ : 0) ) ;
-                System.out.printf("        Weighted Net    =   %,10.1f / %5.1f%%\n", (i.weightedwins_ - i.weightedlosses_), (i.occurrences_ > 0 ? (i.weightedwins_ - i.weightedlosses_)*100.0 / i.occurrences_ : 0) ) ;
+                System.out.printf("        Wins            = %,10d   / %6.2f%%\n",  i.wins_          , (i.occurrences_ > 0 ? i.wins_          *100.0 / i.occurrences_ : 0) ) ;
+                System.out.printf("        Losses          = %,10d   / %6.2f%%\n",  i.losses_        , (i.occurrences_ > 0 ? i.losses_        *100.0 / i.occurrences_ : 0) ) ;
+                System.out.printf("        Pushes          = %,10d   / %6.2f%%\n",  i.pushes_        , (i.occurrences_ > 0 ? i.pushes_        *100.0 / i.occurrences_ : 0) ) ;
+                System.out.printf("        Weighted Wins   =   %,10.1f / %6.2f%%\n", i.weightedwins_  , (i.occurrences_ > 0 ? i.weightedwins_  *100.0 / i.occurrences_ : 0) ) ;
+                System.out.printf("        Weighted Losses =   %,10.1f / %6.2f%%\n", i.weightedlosses_, (i.occurrences_ > 0 ? i.weightedlosses_*100.0 / i.occurrences_ : 0) ) ;
+                System.out.printf("        Weighted Pushes =   %,10.1f / %6.2f%%\n", i.weightedpushes_, (i.occurrences_ > 0 ? i.weightedpushes_*100.0 / i.occurrences_ : 0) ) ;
+                System.out.printf("        Weighted Net    =   %,10.1f / %6.2f%%\n", (i.weightedwins_ - i.weightedlosses_), (i.occurrences_ > 0 ? (i.weightedwins_ - i.weightedlosses_)*100.0 / i.occurrences_ : 0) ) ;
 
                 // Sum it up for the row total
                 handTotal.occurrences_    += i.occurrences_    ;
@@ -197,25 +197,25 @@ public class BlackjackStatistics
             }
             System.out.println("    TOTAL Starting hand " + k1) ;
             System.out.printf("        Frequency       = %,10d\n", handTotal.occurrences_) ;
-            System.out.printf("        Wins            = %,10d   / %5.1f%%\n",  handTotal.wins_          , (handTotal.occurrences_ > 0 ? handTotal.wins_          *100.0 / handTotal.occurrences_ : 0) ) ;
-            System.out.printf("        Losses          = %,10d   / %5.1f%%\n",  handTotal.losses_        , (handTotal.occurrences_ > 0 ? handTotal.losses_        *100.0 / handTotal.occurrences_ : 0) ) ;
-            System.out.printf("        Pushes          = %,10d   / %5.1f%%\n",  handTotal.pushes_        , (handTotal.occurrences_ > 0 ? handTotal.pushes_        *100.0 / handTotal.occurrences_ : 0) ) ;
-            System.out.printf("        Weighted Wins   =   %,10.1f / %5.1f%%\n", handTotal.weightedwins_  , (handTotal.occurrences_ > 0 ? handTotal.weightedwins_  *100.0 / handTotal.occurrences_ : 0) ) ;
-            System.out.printf("        Weighted Losses =   %,10.1f / %5.1f%%\n", handTotal.weightedlosses_, (handTotal.occurrences_ > 0 ? handTotal.weightedlosses_*100.0 / handTotal.occurrences_ : 0) ) ;
-            System.out.printf("        Weighted Pushes =   %,10.1f / %5.1f%%\n", handTotal.weightedpushes_, (handTotal.occurrences_ > 0 ? handTotal.weightedpushes_*100.0 / handTotal.occurrences_ : 0) ) ;
-            System.out.printf("        Weighted Net    =   %,10.1f / %5.1f%%\n", (handTotal.weightedwins_ - handTotal.weightedlosses_), (handTotal.occurrences_ > 0 ? (handTotal.weightedwins_ - handTotal.weightedlosses_)*100.0 / handTotal.occurrences_ : 0) ) ;
+            System.out.printf("        Wins            = %,10d   / %6.2f%%\n",  handTotal.wins_          , (handTotal.occurrences_ > 0 ? handTotal.wins_          *100.0 / handTotal.occurrences_ : 0) ) ;
+            System.out.printf("        Losses          = %,10d   / %6.2f%%\n",  handTotal.losses_        , (handTotal.occurrences_ > 0 ? handTotal.losses_        *100.0 / handTotal.occurrences_ : 0) ) ;
+            System.out.printf("        Pushes          = %,10d   / %6.2f%%\n",  handTotal.pushes_        , (handTotal.occurrences_ > 0 ? handTotal.pushes_        *100.0 / handTotal.occurrences_ : 0) ) ;
+            System.out.printf("        Weighted Wins   =   %,10.1f / %6.2f%%\n", handTotal.weightedwins_  , (handTotal.occurrences_ > 0 ? handTotal.weightedwins_  *100.0 / handTotal.occurrences_ : 0) ) ;
+            System.out.printf("        Weighted Losses =   %,10.1f / %6.2f%%\n", handTotal.weightedlosses_, (handTotal.occurrences_ > 0 ? handTotal.weightedlosses_*100.0 / handTotal.occurrences_ : 0) ) ;
+            System.out.printf("        Weighted Pushes =   %,10.1f / %6.2f%%\n", handTotal.weightedpushes_, (handTotal.occurrences_ > 0 ? handTotal.weightedpushes_*100.0 / handTotal.occurrences_ : 0) ) ;
+            System.out.printf("        Weighted Net    =   %,10.1f / %6.2f%%\n", (handTotal.weightedwins_ - handTotal.weightedlosses_), (handTotal.occurrences_ > 0 ? (handTotal.weightedwins_ - handTotal.weightedlosses_)*100.0 / handTotal.occurrences_ : 0) ) ;
 
 
         }
         System.out.println("TOTALS") ;
         System.out.printf("    Frequency       = %,10d\n", totals.occurrences_   ) ;
-        System.out.printf("    Wins            = %,10d   / %5.1f%%\n",  totals.wins_          , (totals.occurrences_ > 0 ? totals.wins_          *100.0 / totals.occurrences_ : 0) ) ;
-        System.out.printf("    Losses          = %,10d   / %5.1f%%\n",  totals.losses_        , (totals.occurrences_ > 0 ? totals.losses_        *100.0 / totals.occurrences_ : 0) ) ;
-        System.out.printf("    Pushes          = %,10d   / %5.1f%%\n",  totals.pushes_        , (totals.occurrences_ > 0 ? totals.pushes_        *100.0 / totals.occurrences_ : 0) ) ;
-        System.out.printf("    Weighted Wins   =   %,10.1f / %5.1f%%\n", totals.weightedwins_  , (totals.occurrences_ > 0 ? totals.weightedwins_  *100.0 / totals.occurrences_ : 0) ) ;
-        System.out.printf("    Weighted Losses =   %,10.1f / %5.1f%%\n", totals.weightedlosses_, (totals.occurrences_ > 0 ? totals.weightedlosses_*100.0 / totals.occurrences_ : 0) ) ;
-        System.out.printf("    Weighted Pushes =   %,10.1f / %5.1f%%\n", totals.weightedpushes_, (totals.occurrences_ > 0 ? totals.weightedpushes_*100.0 / totals.occurrences_ : 0) ) ;
-        System.out.printf("    Weighted Net    =   %,10.1f / %5.1f%%\n", (totals.weightedwins_ - totals.weightedlosses_), (totals.occurrences_ > 0 ? (totals.weightedwins_ - totals.weightedlosses_)*100.0 / totals.occurrences_ : 0) ) ;
+        System.out.printf("    Wins            = %,10d   / %6.2f%%\n",  totals.wins_          , (totals.occurrences_ > 0 ? totals.wins_          *100.0 / totals.occurrences_ : 0) ) ;
+        System.out.printf("    Losses          = %,10d   / %6.2f%%\n",  totals.losses_        , (totals.occurrences_ > 0 ? totals.losses_        *100.0 / totals.occurrences_ : 0) ) ;
+        System.out.printf("    Pushes          = %,10d   / %6.2f%%\n",  totals.pushes_        , (totals.occurrences_ > 0 ? totals.pushes_        *100.0 / totals.occurrences_ : 0) ) ;
+        System.out.printf("    Weighted Wins   =   %,10.1f / %6.2f%%\n", totals.weightedwins_  , (totals.occurrences_ > 0 ? totals.weightedwins_  *100.0 / totals.occurrences_ : 0) ) ;
+        System.out.printf("    Weighted Losses =   %,10.1f / %6.2f%%\n", totals.weightedlosses_, (totals.occurrences_ > 0 ? totals.weightedlosses_*100.0 / totals.occurrences_ : 0) ) ;
+        System.out.printf("    Weighted Pushes =   %,10.1f / %6.2f%%\n", totals.weightedpushes_, (totals.occurrences_ > 0 ? totals.weightedpushes_*100.0 / totals.occurrences_ : 0) ) ;
+        System.out.printf("    Weighted Net    =   %,10.1f / %6.2f%%\n", (totals.weightedwins_ - totals.weightedlosses_), (totals.occurrences_ > 0 ? (totals.weightedwins_ - totals.weightedlosses_)*100.0 / totals.occurrences_ : 0) ) ;
     }
 
     /*
@@ -260,7 +260,7 @@ public class BlackjackStatistics
                 }
 
                 BlackjackStatisticsInfo info = stats_.get(v).get(r) ;
-                System.out.printf(",%.1f%%", (info.occurrences_ > 0 ? (info.weightedwins_ - info.weightedlosses_)*100.0 / info.occurrences_ : 0) ) ;
+                System.out.printf(",%.2f%%", (info.occurrences_ > 0 ? (info.weightedwins_ - info.weightedlosses_)*100.0 / info.occurrences_ : 0) ) ;
 
                 // Sum it up for the row total
                 handTotal.occurrences_    += info.occurrences_    ;
@@ -289,15 +289,15 @@ public class BlackjackStatistics
                 ++j ;
             }
             init = true ;
-            System.out.printf(",%.1f%%", (handTotal.occurrences_ > 0 ? (handTotal.weightedwins_ - handTotal.weightedlosses_)*100.0 / handTotal.occurrences_ : 0) ) ;
+            System.out.printf(",%.2f%%", (handTotal.occurrences_ > 0 ? (handTotal.weightedwins_ - handTotal.weightedlosses_)*100.0 / handTotal.occurrences_ : 0) ) ;
             System.out.println() ;
         }
         System.out.print("ALL") ;
         for(int i = 0 ; i < dealerHandsTotal.size() ; ++i)
         {
-            System.out.printf(",%.1f%%", (dealerHandsTotal.get(i).occurrences_ > 0 ? (dealerHandsTotal.get(i).weightedwins_ - dealerHandsTotal.get(i).weightedlosses_)*100.0 / dealerHandsTotal.get(i).occurrences_ : 0) ) ;
+            System.out.printf(",%.2f%%", (dealerHandsTotal.get(i).occurrences_ > 0 ? (dealerHandsTotal.get(i).weightedwins_ - dealerHandsTotal.get(i).weightedlosses_)*100.0 / dealerHandsTotal.get(i).occurrences_ : 0) ) ;
         }
-        System.out.printf(",%.1f%%", (totals.occurrences_ > 0 ? (totals.weightedwins_ - totals.weightedlosses_)*100.0 / totals.occurrences_ : 0) ) ;
+        System.out.printf(",%.2f%%", (totals.occurrences_ > 0 ? (totals.weightedwins_ - totals.weightedlosses_)*100.0 / totals.occurrences_ : 0) ) ;
         System.out.println() ;
     }
 }
