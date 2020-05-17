@@ -139,11 +139,9 @@ public class BlackjackStrategy
         {
             normalizedDealerUpcard = Card.valueOf(Card.Rank.Ten,Card.Suit.Spades) ;
         }
-        //System.out.print("        ...getHandDecision( hand = " + h.getHandValue() + ", dealer upcard = " + normalizedDealerUpcard + ") = " ) ;
 
-        // Early surrender is before the dealer checks their hold card; skipped
-        // Late surrender is after the dealer checks their hold card.
-        if(!h.isPair() && r.getAllowLateSurrender() &&
+        // surrender?
+        if(!h.isPair() && r.getAllowSurrender() &&
            surrenderStrategies_.get(h.getHandValue()).get(normalizedDealerUpcard) == BlackjackStrategy.StrategicMove.Surrender)
         {
             if(h.cardCount() == 2)
@@ -153,7 +151,7 @@ public class BlackjackStrategy
         }
 
         // If we have a pair, process it
-        if(Blackjack.Move.Surrender != move && h.isPair())
+        if(Blackjack.Move.Unknown == move && h.isPair())
         {
             //
             // Figure out which pair we have; config shows one number and 1 = Ace
@@ -220,7 +218,6 @@ public class BlackjackStrategy
 
         // Then hard totals
         if(Blackjack.Move.Unknown == move)
-
         {
             BlackjackStrategy.StrategicMove m = hardTotalStrategies_.get(h.getHandValue()).get(normalizedDealerUpcard) ;
             switch(m)
@@ -388,7 +385,7 @@ public class BlackjackStrategy
         return ret ;
     }
 
-    private static Card getCardForConfigValue(Integer i)
+    public static Card getCardForConfigValue(Integer i) throws Exception
     {
         Card c = null ;
 
@@ -424,6 +421,8 @@ public class BlackjackStrategy
             case 11:
                 c = Card.valueOf(Card.Rank.Ace,Card.Suit.Spades) ;
                 break ;
+            default:
+                throw new Exception("Unkown card") ;
         }
         return c ;
     }

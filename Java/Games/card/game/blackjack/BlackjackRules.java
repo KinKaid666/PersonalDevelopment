@@ -6,7 +6,6 @@ public class BlackjackRules
     private boolean splitAces_          ;
     private boolean hitOnSoft17_        ;
     private boolean allowSurrender_     ;
-    private boolean allowLateSurrender_ ;
     private boolean resplitToNN_        ;
     private boolean resplitAces_        ;
     private boolean doubleAfterSplit_   ;
@@ -17,7 +16,6 @@ public class BlackjackRules
                            boolean splitAces          ,
                            boolean hitOnSoft17        ,
                            boolean allowSurrender     ,
-                           boolean allowLateSurrender ,
                            boolean resplitToNN        ,
                            boolean resplitAces        ,
                            boolean doubleAfterSplit   ,
@@ -28,7 +26,6 @@ public class BlackjackRules
         splitAces_          = splitAces          ;
         hitOnSoft17_        = hitOnSoft17        ;
         allowSurrender_     = allowSurrender     ;
-        allowLateSurrender_ = allowLateSurrender ;
         resplitToNN_        = resplitToNN        ;
         resplitAces_        = resplitAces        ;
         doubleAfterSplit_   = doubleAfterSplit   ;
@@ -40,7 +37,6 @@ public class BlackjackRules
     public boolean getCanSplitAces()        { return splitAces_          ; }
     public boolean getDealerHitSoft17()     { return hitOnSoft17_        ; }
     public boolean getAllowSurrender()      { return allowSurrender_     ; }
-    public boolean getAllowLateSurrender()  { return allowLateSurrender_ ; }
     public boolean getCanResplitPairs()     { return resplitToNN_        ; }
     public boolean getCanResplitAces()      { return resplitAces_        ; }
     public boolean getCanDoubleAfterSplit (){ return doubleAfterSplit_   ; }

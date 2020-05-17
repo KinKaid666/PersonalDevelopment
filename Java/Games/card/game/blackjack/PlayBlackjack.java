@@ -10,21 +10,6 @@ class PlayBlackjack
 {
     public static void main(String[] args)
     {
-        /*
-        Card c1 = Card.valueOf(Card.Rank.Ten, Card.Suit.Spades),
-             c2 = Card.valueOf(Card.Rank.Ten, Card.Suit.Spades),
-             c3 = Card.valueOf(Card.Rank.Ten, Card.Suit.Spades),
-             c4 = Card.valueOf(Card.Rank.Ace, Card.Suit.Spades),
-             c5 = Card.valueOf(Card.Rank.Ace, Card.Suit.Spades),
-             c6 = Card.valueOf(Card.Rank.Ace, Card.Suit.Spades);
-        BlackjackHand h = new BlackjackHand(c1,c2) ;
-        h.add(c3) ;
-        h.add(c4) ;
-        h.add(c5) ;
-        h.add(c6) ;
-        System.out.println(h) ;
-        */
-
         if(!(args.length == 3 || args.length == 4))
         {
             System.err.println("usage: java " + System.getProperty("sun.java.command").split(" ")[0] + " <number of players> <number of shuffles> <strategy filename> [verbose: 1 or default:0]") ;
@@ -44,7 +29,6 @@ class PlayBlackjack
                                                    true,  // split Aces
                                                    true,  // dealer hit soft 17
                                                    true,  // allow surrender
-                                                   false, // allow late surrender
                                                    true,  // replit pairs
                                                    false, // resplit aces
                                                    true,  // double after splitj

@@ -68,9 +68,21 @@ public class Blackjack
 
             Card dealerUpcard = dealerHand.getCard(0) ;
 
-            // TODO: dealer Insurance
-            boolean playersLeft = false ;
+            // Allow surrenders first
+            if( rules_.getAllowSurrender () )
+            {
+                int i = 0 ;
+                for( BlackjackPlayer p : players_ )
+                {
+                    if(Move.Surrender == p.getHandDecision(rules_,hands.get(i).get(0),dealerUpcard))
+                    {
+                        hands.get(i).get(0).surrender() ;
+                    }
+                    ++i ;
+                }
+            }
 
+            boolean playersLeft = false ;
             if( dealerHand.getHandValue() != 21 )
             {
                 // Index into our player and hand outter array

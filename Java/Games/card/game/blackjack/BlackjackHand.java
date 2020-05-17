@@ -372,4 +372,169 @@ public class BlackjackHand
         }
         return a ;
     }
+
+    public static BlackjackHand createHand(BlackjackHand.BlackjackHandValue hv)
+    {
+        BlackjackHand h ;
+        Card c1 = null, c2 = null, extra = null ;
+        switch(hv)
+        {
+            case Five:
+                c1 = Card.valueOf(Card.Rank.Deuce,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                break ;
+            case Six:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                break ;
+            case Seven:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Four, Card.Suit.Spades) ;
+                break ;
+            case Eight:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Five, Card.Suit.Spades) ;
+                break ;
+            case Nine:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Six,  Card.Suit.Spades) ;
+                break ;
+            case Ten:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Seven,Card.Suit.Spades) ;
+                break ;
+            case Eleven:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Eight,Card.Suit.Spades) ;
+                break ;
+            case Twelve:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Nine, Card.Suit.Spades) ;
+                break ;
+            case Thirteen:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                break ;
+            case Fourteen:
+                c1 = Card.valueOf(Card.Rank.Four, Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                break ;
+            case Fifteen:
+                c1 = Card.valueOf(Card.Rank.Five, Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                break ;
+            case Sixteen:
+                c1 = Card.valueOf(Card.Rank.Six,  Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                break ;
+            case Seventeen:
+                c1 = Card.valueOf(Card.Rank.Seven,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                break ;
+            case Eighteen:
+                c1 = Card.valueOf(Card.Rank.Eight,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                break ;
+            case Nineteen:
+                c1 = Card.valueOf(Card.Rank.Nine, Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                break ;
+            case Twenty:
+                c1 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                break ;
+            case TwentyOne:
+                c2 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                c1 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                break ;
+            case SoftTwelve:
+                c1 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                extra = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+
+                break ;
+            case SoftThirteen:
+                c1 = Card.valueOf(Card.Rank.Deuce,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                break ;
+            case SoftFourteen:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                break ;
+            case SoftFifteen:
+                c1 = Card.valueOf(Card.Rank.Four, Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                break ;
+            case SoftSixteen:
+                c1 = Card.valueOf(Card.Rank.Five, Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                break ;
+            case SoftSeventeen:
+                c1 = Card.valueOf(Card.Rank.Six,  Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                break ;
+            case SoftEighteen:
+                c1 = Card.valueOf(Card.Rank.Seven,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                break ;
+            case SoftNineteen:
+                c1 = Card.valueOf(Card.Rank.Eight,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                break ;
+            case SoftTwenty:
+                c1 = Card.valueOf(Card.Rank.Nine, Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                break ;
+            case PairOfTwos:
+                c1 = Card.valueOf(Card.Rank.Deuce,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Deuce,Card.Suit.Spades) ;
+                break ;
+            case PairOfThrees:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                break ;
+            case PairOfFours:
+                c1 = Card.valueOf(Card.Rank.Four, Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Four, Card.Suit.Spades) ;
+                break ;
+            case PairOfFives:
+                c1 = Card.valueOf(Card.Rank.Five, Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Five, Card.Suit.Spades) ;
+                break ;
+            case PairOfSixes:
+                c1 = Card.valueOf(Card.Rank.Six,  Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Six,  Card.Suit.Spades) ;
+                break ;
+            case PairOfSevens:
+                c1 = Card.valueOf(Card.Rank.Seven,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Seven,Card.Suit.Spades) ;
+                break ;
+            case PairOfEights:
+                c1 = Card.valueOf(Card.Rank.Eight,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Eight,Card.Suit.Spades) ;
+                break ;
+            case PairOfNines:
+                c1 = Card.valueOf(Card.Rank.Nine, Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Nine, Card.Suit.Spades) ;
+                break ;
+            case PairOfTens:
+                c1 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                break ;
+            case PairOfAces:
+                c1 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
+                break ;
+            case Blackjack:
+                c1 = Card.valueOf(Card.Rank.Ten,  Card.Suit.Spades) ;
+                c2 = Card.valueOf(Card.Rank.Ace,  Card.Suit.Spades) ;
+                break ;
+        }
+        h = new BlackjackHand(c1,c2) ;
+        if(extra != null)
+        {
+            h.add(extra) ;
+        }
+        return h ;
+    }
 }
