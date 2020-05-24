@@ -2,12 +2,15 @@ package card.game.blackjack ;
 
 import java.util.List ;
 import java.util.LinkedList ;
+import java.util.logging.Logger ;
 
 import card.game.blackjack.* ;
 import card.Card ;
 
 class PlayBlackjack
 {
+    private static Logger logger = Logger.getLogger(PlayBlackjack.class.getName()) ;
+
     public static void main(String[] args)
     {
         if(!(args.length == 3 || args.length == 4))
@@ -28,7 +31,8 @@ class PlayBlackjack
         BlackjackRules rules = new BlackjackRules( 8,     // Decks
                                                    true,  // split Aces
                                                    true,  // dealer hit soft 17
-                                                   true,  // allow surrender
+                                                   false, // allow early surrender
+                                                   true,  // allow late surrender
                                                    true,  // replit pairs
                                                    false, // resplit aces
                                                    true,  // double after splitj

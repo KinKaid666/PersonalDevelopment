@@ -5,8 +5,11 @@ import card.Card ;
 import java.util.LinkedList ;
 import java.util.List ;
 
+import java.util.logging.Logger ;
+
 public class BlackjackHand
 {
+    private static Logger logger = Logger.getLogger(BlackjackHand.class.getName()) ;
 
     private Integer bet_         = null ;
     private boolean doubled_     = false ;

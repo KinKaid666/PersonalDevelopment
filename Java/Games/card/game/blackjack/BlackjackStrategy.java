@@ -7,6 +7,7 @@ import java.util.Map ;
 import java.util.List ;
 import card.game.blackjack.* ;
 import card.Card ;
+import java.util.logging.Logger ;
 
 /*
  * Class that encapsulates our strategy
@@ -29,9 +30,10 @@ import card.Card ;
  *     C=Surrender (capitulate)
  *     X=Do nothing
  */
-// TODO: store each filename into a has so we don't re-create each object
 public class BlackjackStrategy
 {
+    private static Logger logger = Logger.getLogger(BlackjackStrategy.class.getName()) ;
+
     /* keeping the stats tied to the statistics */
     private BlackjackStatistics stats_ = new BlackjackStatistics() ;
     private static Map<String, BlackjackStrategy> strategies_ = new HashMap<String,BlackjackStrategy>() ;
@@ -141,13 +143,12 @@ public class BlackjackStrategy
         }
 
         // surrender?
-        if(!h.isPair() && r.getAllowSurrender() &&
-           surrenderStrategies_.get(h.getHandValue()).get(normalizedDealerUpcard) == BlackjackStrategy.StrategicMove.Surrender)
+        if(!h.isPair() &&
+                h.cardCount() == 2 &&
+               (r.getAllowEarlySurrender() || r.getAllowLateSurrender()) &&
+               surrenderStrategies_.get(h.getHandValue()).get(normalizedDealerUpcard) == BlackjackStrategy.StrategicMove.Surrender)
         {
-            if(h.cardCount() == 2)
-            {
-                move = Blackjack.Move.Surrender ;
-            }
+            move = Blackjack.Move.Surrender ;
         }
 
         // If we have a pair, process it

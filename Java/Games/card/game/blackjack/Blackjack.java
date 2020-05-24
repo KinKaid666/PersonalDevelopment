@@ -8,8 +8,11 @@ import java.util.Collections ;
 import java.util.List ;
 import java.util.LinkedList ;
 
+import java.util.logging.Logger ;
+
 public class Blackjack
 {
+    private static Logger logger = Logger.getLogger(Blackjack.class.getName()) ;
 
     /* Playing objects */
     private BlackjackRules        rules_         = null ;
@@ -68,8 +71,8 @@ public class Blackjack
 
             Card dealerUpcard = dealerHand.getCard(0) ;
 
-            // Allow surrenders first
-            if( rules_.getAllowSurrender () )
+            // Allow surrenders first, if rules allow
+            if( rules_.getAllowEarlySurrender() )
             {
                 int i = 0 ;
                 for( BlackjackPlayer p : players_ )

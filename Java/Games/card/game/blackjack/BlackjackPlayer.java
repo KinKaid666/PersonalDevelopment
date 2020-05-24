@@ -2,8 +2,12 @@ package card.game.blackjack ;
 
 import card.Card ;
 import card.game.blackjack.* ;
+import java.util.logging.Logger ;
+
 public class BlackjackPlayer
 {
+    private static Logger logger = Logger.getLogger(BlackjackPlayer.class.getName()) ;
+
     private String            name_ ;
     private BlackjackStrategy strategy_ ;
 

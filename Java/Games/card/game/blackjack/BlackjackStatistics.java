@@ -7,6 +7,7 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.HashMap ;
 import java.util.EnumMap ;
+import java.util.logging.Logger ;
 
 /*
  * Class used to help track statistics
@@ -15,6 +16,8 @@ import java.util.EnumMap ;
  */
 public class BlackjackStatistics
 {
+    private static Logger logger = Logger.getLogger(BlackjackStatistics.class.getName()) ;
+
     /* struct to record statitics */
     private class BlackjackStatisticsInfo
     {
