@@ -2,3 +2,4 @@
 2. Add card counting
 3. Add machine learning to determine the best strategy
 4. Convert sim to be command-line based for faster iteration
+5. Add logging
