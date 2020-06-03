@@ -142,15 +142,6 @@ public class BlackjackStrategy
             normalizedDealerUpcard = Card.valueOf(Card.Rank.Ten,Card.Suit.Spades) ;
         }
 
-        // surrender?
-        if(!h.isPair() &&
-                h.cardCount() == 2 &&
-               (r.getAllowEarlySurrender() || r.getAllowLateSurrender()) &&
-               surrenderStrategies_.get(h.getHandValue()).get(normalizedDealerUpcard) == BlackjackStrategy.StrategicMove.Surrender)
-        {
-            move = Blackjack.Move.Surrender ;
-        }
-
         // If we have a pair, process it
         if(Blackjack.Move.Unknown == move && h.isPair())
         {
@@ -215,6 +206,15 @@ public class BlackjackStrategy
                     }
                     break ;
             }
+        }
+
+        // surrender?
+        if(Blackjack.Move.Unknown == move &&
+                h.cardCount() == 2 &&
+               (r.getAllowEarlySurrender() || r.getAllowLateSurrender()) &&
+               surrenderStrategies_.get(h.getHandValue()).get(normalizedDealerUpcard) == BlackjackStrategy.StrategicMove.Surrender)
+        {
+            move = Blackjack.Move.Surrender ;
         }
 
         // Then hard totals
