@@ -35,10 +35,4 @@ public class BlackjackPlayer
     {
         return strategy_ ;
     }
-
-    public void printPlayer()
-    {
-        System.out.println("Announcing Player with name '" + name_ + "'") ;
-        strategy_.printStrategy() ;
-    }
 }

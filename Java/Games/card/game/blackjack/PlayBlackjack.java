@@ -15,7 +15,7 @@ class PlayBlackjack
     {
         if(!(args.length == 3 || args.length == 4))
         {
-            System.err.println("usage: java " + System.getProperty("sun.java.command").split(" ")[0] + " <number of players> <number of shuffles> <strategy filename> [verbose: 1 or default:0]") ;
+            System.err.println("usage: java " + System.getProperty("sun.java.command").split(" ")[0] + " <number of players> <number of shuffles> <strategy filename or 0 for Random> [verbose: 1 or default:0]") ;
             System.exit(1) ;
         }
         int numplayers = Integer.parseInt(args[0]) ;
@@ -42,10 +42,17 @@ class PlayBlackjack
         BlackjackStrategy s = null ;
         try
         {
-            s = BlackjackStrategy.createStrategyFromFile(args[2]) ;
+            if(args[2].equals("0"))
+            {
+                s = BlackjackStrategy.createRandom() ;
+            }
+            else
+            {
+                s = BlackjackStrategyStatic.createStrategyFromFile(args[2]) ;
+            }
             if(verbose)
             {
-                s.printStrategy() ;
+                s.printStrategy(System.out) ;
             }
         }
         catch (Exception e)
@@ -87,8 +94,8 @@ class PlayBlackjack
         }
         if(verbose)
         {
-            s.printStatistics() ;
+            s.printStatistics(System.out) ;
         }
-        s.printStatisticsCSV() ;
+        s.printStatisticsCSV(System.out) ;
     }
 }

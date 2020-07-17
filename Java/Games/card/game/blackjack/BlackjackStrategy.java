@@ -1,52 +1,22 @@
 package card.game.blackjack ;
 
-import java.lang.Exception ;
-import java.io.* ;
-import java.util.HashMap ;
-import java.util.Map ;
-import java.util.List ;
-import card.game.blackjack.* ;
 import card.Card ;
-import java.util.logging.Logger ;
+import java.util.* ;
+import java.io.PrintStream ;
+import java.util.Random ;
 
 /*
- * Class that encapsulates our strategy
- *
- * FILE
- * #   PAIRS
- *     Y=Split Pair
- *     N=Don't Split Pair
- *     A=Split if Double After Split Allowed, otherwise do not split
- *   SOFT TOTALS
- *     S=Stand
- *     H=Hit
- *     D=Double if allowed, else Hit
- *     X=Double if allowed, else Stand
- *   HARD TOTALS
- *     S=Stand
- *     H=Hit
- *     D=Double if allowed, else Hit
- *   SURRENDER
- *     C=Surrender (capitulate)
- *     X=Do nothing
+ * Base class
  */
 public class BlackjackStrategy
 {
-    private static Logger logger = Logger.getLogger(BlackjackStrategy.class.getName()) ;
-
-    /* keeping the stats tied to the statistics */
     private BlackjackStatistics stats_ = new BlackjackStatistics() ;
-    private static Map<String, BlackjackStrategy> strategies_ = new HashMap<String,BlackjackStrategy>() ;
+    static final Random random_ = new Random(System.currentTimeMillis()) ;
 
-    private final static String      PAIRS_STRING = "Pairs"    ;
-    private final static String SOFT_TOTAL_STRING = "SoftTotal" ;
-    private final static String HARD_TOTAL_STRING = "HardTotal" ;
-    private final static String  SURRENDER_STRING = "Surrender" ;
-
-    private Map<Integer, Map<Card, StrategicMove>>      pairStrategies_ = null ;
-    private Map<Integer, Map<Card, StrategicMove>> softTotalStrategies_ = null ;
-    private Map<Integer, Map<Card, StrategicMove>> hardTotalStrategies_ = null ;
-    private Map<Integer, Map<Card, StrategicMove>> surrenderStrategies_ = null ;
+    private HashMap<Integer, HashMap<Card, StrategicMove>>      pairStrategies_ = null ;
+    private HashMap<Integer, HashMap<Card, StrategicMove>> softTotalStrategies_ = null ;
+    private HashMap<Integer, HashMap<Card, StrategicMove>> hardTotalStrategies_ = null ;
+    private HashMap<Integer, HashMap<Card, StrategicMove>> surrenderStrategies_ = null ;
 
     private boolean takeInsurance_ ;
     private boolean takeEvenMoney_ ;
@@ -64,66 +34,314 @@ public class BlackjackStrategy
         NoSurrender
     } ;
 
-    /*
-     * The strategy is found in file
-     *   Formmat
-     *      1: # Comment
-     *
-     */
-    private BlackjackStrategy(Map<Integer, Map<Card, StrategicMove>>      pairStrategies,
-                              Map<Integer, Map<Card, StrategicMove>> softTotalStrategies,
-                              Map<Integer, Map<Card, StrategicMove>> hardTotalStrategies,
-                              Map<Integer, Map<Card, StrategicMove>> surrenderStrategies,
-                              boolean                                takeInsurance      ,
-                              boolean                                takeEvenMoney      )
+    public BlackjackStrategy(
+                    HashMap<Integer, HashMap<Card, StrategicMove>>      pairStrategies,
+                    HashMap<Integer, HashMap<Card, StrategicMove>> softTotalStrategies,
+                    HashMap<Integer, HashMap<Card, StrategicMove>> hardTotalStrategies,
+                    HashMap<Integer, HashMap<Card, StrategicMove>> surrenderStrategies,
+                    boolean                                takeInsurance      ,
+                    boolean                                takeEvenMoney      )
     {
-             pairStrategies_ =      pairStrategies ;
-        softTotalStrategies_ = softTotalStrategies ;
-        hardTotalStrategies_ = hardTotalStrategies ;
-        surrenderStrategies_ = surrenderStrategies ;
-        takeInsurance_ = takeInsurance ;
-        takeEvenMoney_ = takeEvenMoney ;
+              pairStrategies_ =      pairStrategies ;
+         softTotalStrategies_ = softTotalStrategies ;
+         hardTotalStrategies_ = hardTotalStrategies ;
+         surrenderStrategies_ = surrenderStrategies ;
+         takeInsurance_       = takeInsurance       ;
+         takeEvenMoney_       = takeEvenMoney       ;
     }
 
     /*
      * Forwarding functions to the statistics helper class
      */
-    public void recordHandList(List<BlackjackHand> handList, Card c, List<BlackjackHand.Outcome> outcomes, double[] weights) throws Exception
+    public void recordHandList(List<BlackjackHand>         handList,
+                               Card                        c,
+                               List<BlackjackHand.Outcome> outcomes,
+                               double[]                    weights) throws Exception
     {
         stats_.recordHandList(handList, c, outcomes, weights) ;
     }
 
     /* Forwarding functions */
-    public void printStatistics()    { stats_.printStatistics()    ; }
-    public void printStatisticsCSV() { stats_.printStatisticsCSV() ; }
+    public void printStatistics   (PrintStream o) { stats_.printStatistics(o)   ; }
+    public void printStatisticsCSV(PrintStream o) { stats_.printStatisticsCSV(o); }
+    public double getFitness() { return stats_.getFitness() ; }
+
+    /*
+     * Genetic Algorthim Functions
+     */
+    //
+    // Blend the this and other into a new object
+    //   Randomly take one row of data from either object
+    //
+    public BlackjackStrategy crossover(BlackjackStrategy other)
+    {
+        BlackjackStrategy s = this.clone() ;
+        for(Integer key : s.pairStrategies_.keySet())
+        {
+            for( Card c : pairStrategies_.get(key).keySet() )
+            {
+                if(random_.nextBoolean())
+                {
+                    s.pairStrategies_.get(key).put(c,other.pairStrategies_.get(key).get(c)) ;
+                }
+            }
+        }
+        for(Integer key : s.softTotalStrategies_.keySet())
+        {
+            for( Card c : softTotalStrategies_.get(key).keySet() )
+            {
+                if(random_.nextBoolean())
+                {
+                    s.softTotalStrategies_.get(key).put(c,other.softTotalStrategies_.get(key).get(c)) ;
+                }
+            }
+        }
+        for(Integer key : s.hardTotalStrategies_.keySet())
+        {
+            for( Card c : hardTotalStrategies_.get(key).keySet() )
+            {
+                if(random_.nextBoolean())
+                {
+                    s.hardTotalStrategies_.get(key).put(c,other.hardTotalStrategies_.get(key).get(c)) ;
+                }
+            }
+        }
+        for(Integer key : s.surrenderStrategies_.keySet())
+        {
+            for( Card c : surrenderStrategies_.get(key).keySet() )
+            {
+                if(random_.nextBoolean())
+                {
+                    s.surrenderStrategies_.get(key).put(c,other.surrenderStrategies_.get(key).get(c)) ;
+                }
+            }
+        }
+        return s ;
+    }
+
+
+    //
+    // Iterate over the configuration and mutate at the learning rate (percentage)
+    public void mutate(double mutationRate)
+    {
+        for(Integer key : pairStrategies_.keySet())
+        {
+            for( Card c : pairStrategies_.get(key).keySet() )
+            {
+                if(random_.nextDouble() < mutationRate)
+                {
+                    StrategicMove m = (random_.nextBoolean() ? StrategicMove.Split : StrategicMove.Stand ) ;
+                    pairStrategies_.get(key).put(c,m) ;
+                }
+            }
+        }
+        for(Integer key : softTotalStrategies_.keySet())
+        {
+            for( Card c : softTotalStrategies_.get(key).keySet() )
+            {
+                if(random_.nextDouble() < mutationRate)
+                {
+                    StrategicMove[] options = new StrategicMove[]{StrategicMove.DoubleElseHit,StrategicMove.Stand,StrategicMove.Hit} ;
+                    StrategicMove m = options[random_.nextInt(3)] ;
+                    softTotalStrategies_.get(key).put(c,m) ;
+                }
+            }
+        }
+        for(Integer key : hardTotalStrategies_.keySet())
+        {
+            for( Card c : hardTotalStrategies_.get(key).keySet() )
+            {
+                if(random_.nextDouble() < mutationRate)
+                {
+                    StrategicMove[] options = new StrategicMove[]{StrategicMove.DoubleElseHit,StrategicMove.Stand,StrategicMove.Hit} ;
+                    StrategicMove m = options[random_.nextInt(3)] ;
+                    hardTotalStrategies_.get(key).put(c,m) ;
+                }
+            }
+        }
+        for(Integer key : surrenderStrategies_.keySet())
+        {
+            for( Card c : surrenderStrategies_.get(key).keySet() )
+            {
+                if(random_.nextDouble() < mutationRate)
+                {
+                    StrategicMove m = (random_.nextBoolean() ? StrategicMove.Surrender : StrategicMove.NoSurrender) ;
+                    surrenderStrategies_.get(key).put(c,m) ;
+                }
+            }
+        }
+    }
+
+    // deep Clone, avoid annoying java-ness
+    @SuppressWarnings("unchecked")
+    public BlackjackStrategy clone()
+    {
+        // Clone each of the Hashmaps, but the inside Hashmap is still a shallow
+        BlackjackStrategy s = new BlackjackStrategy(
+                (HashMap<Integer,HashMap<Card,StrategicMove>>)pairStrategies_.clone(),
+                (HashMap<Integer,HashMap<Card,StrategicMove>>)softTotalStrategies_.clone(),
+                (HashMap<Integer,HashMap<Card,StrategicMove>>)hardTotalStrategies_.clone(),
+                (HashMap<Integer,HashMap<Card,StrategicMove>>)surrenderStrategies_.clone(),
+                takeInsurance_,
+                takeEvenMoney_                ) ;
+        for(Integer key : pairStrategies_.keySet())
+        {
+            s.pairStrategies_.put(key,(HashMap<Card,StrategicMove>)pairStrategies_.get(key).clone()) ;
+        }
+        for(Integer key : softTotalStrategies_.keySet())
+        {
+            s.softTotalStrategies_.put(key,(HashMap<Card,StrategicMove>)softTotalStrategies_.get(key).clone()) ;
+        }
+        for(Integer key : hardTotalStrategies_.keySet())
+        {
+            s.hardTotalStrategies_.put(key,(HashMap<Card,StrategicMove>)hardTotalStrategies_.get(key).clone()) ;
+        }
+        for(Integer key : surrenderStrategies_.keySet())
+        {
+            s.surrenderStrategies_.put(key,(HashMap<Card,StrategicMove>)surrenderStrategies_.get(key).clone()) ;
+        }
+        return s ;
+    }
 
     /*
      * Printing function
      */
-    public void printStrategy()
+    public void printStrategy(PrintStream o)
     {
-        System.out.println("*** Dumping Configuration" ) ;
-        System.out.println("    *** Dumping pair strategies" ) ;
-        BlackjackStrategy.printStrategyHelper(pairStrategies_) ;
-        System.out.println("    *** Dumping soft totals strategies" ) ;
-        BlackjackStrategy.printStrategyHelper(softTotalStrategies_) ;
-        System.out.println("    *** Dumping hard totals strategies" ) ;
-        BlackjackStrategy.printStrategyHelper(hardTotalStrategies_) ;
-        System.out.println("    *** Dumping surrender strategies" ) ;
-        BlackjackStrategy.printStrategyHelper(surrenderStrategies_) ;
-        System.out.println("    takeInsurance = " + (takeInsurance_? "true":"false")) ;
-        System.out.println("    takeEvenMoney = " + (takeEvenMoney_? "true":"false")) ;
+        o.println("*** Dumping Configuration" ) ; 
+        o.println("    *** Dumping pair strategies" ) ; 
+        BlackjackStrategyStatic.printStrategyHelper(pairStrategies_,o) ;
+        o.println("    *** Dumping soft totals strategies" ) ; 
+        BlackjackStrategyStatic.printStrategyHelper(softTotalStrategies_,o) ;
+        o.println("    *** Dumping hard totals strategies" ) ; 
+        BlackjackStrategyStatic.printStrategyHelper(hardTotalStrategies_,o) ;
+        o.println("    *** Dumping surrender strategies" ) ; 
+        BlackjackStrategyStatic.printStrategyHelper(surrenderStrategies_,o) ;
+        o.println("    takeInsurance = " + (takeInsurance_? "true":"false")) ;
+        o.println("    takeEvenMoney = " + (takeEvenMoney_? "true":"false")) ;
     }
 
-    public static void printStrategyHelper(Map<Integer, Map<Card, StrategicMove>> m)
+    public static void printStrategyHelper(HashMap<Integer, HashMap<Card, StrategicMove>> m, PrintStream o)
     {
         for(Integer key : m.keySet())
         {
             for( Card c : m.get(key).keySet() )
             {
-                System.out.println("        PlayerHandValue = " + key + ", Dealer Upcard = " + c + ",\tMove = " + m.get(key).get(c)) ;
+                o.println("        PlayerHandValue = " + key + ", Dealer Upcard = " + c + ",\tMove = " + m.get(key).get(c)) ;
             }
         }
+    }
+
+    public static BlackjackStrategy createRandom()
+    {
+
+        // Initialize all the maps and then call super
+        HashMap<Integer,HashMap<Card,StrategicMove>>     pairsStrategies = new HashMap<Integer,HashMap<Card,StrategicMove>>() ;
+        HashMap<Integer,HashMap<Card,StrategicMove>> softTotalStrategies = new HashMap<Integer,HashMap<Card,StrategicMove>>() ;
+        HashMap<Integer,HashMap<Card,StrategicMove>> hardTotalStrategies = new HashMap<Integer,HashMap<Card,StrategicMove>>() ;
+        HashMap<Integer,HashMap<Card,StrategicMove>> surrenderStrategies = new HashMap<Integer,HashMap<Card,StrategicMove>>() ;
+
+        try
+        {
+        // Randomly Initialize Pair values with Split or Not
+        //   outter loop = pair value
+        for(int i = 1 ; i < 11 ; i++)
+        {
+            // inner loop = dearler upcard
+            for(int j = 2 ; j < 12 ; j++)
+            {
+                Card c = BlackjackStrategyStatic.getCardForConfigValue(j) ;
+                StrategicMove m = (random_.nextBoolean() ? StrategicMove.Split : StrategicMove.Stand ) ;
+                if(pairsStrategies.containsKey(i))
+                {
+                    pairsStrategies.get(i).put(c,m) ;
+                }
+                else
+                {
+                    HashMap<Card,StrategicMove> csm = new HashMap<Card,StrategicMove>() ;
+                    csm.put(c,m) ;
+                    pairsStrategies.put(i,csm) ;
+                }
+            }
+        }
+
+        // Randomly initialize soft totals with stand, hit or double
+        //   outter loop = player hand
+        for(int i = 12 ; i < 22 ; i++)
+        {
+            // inner loop = dearler upcard
+            for(int j = 2 ; j < 12 ; j++)
+            {
+                Card c = BlackjackStrategyStatic.getCardForConfigValue(j) ;
+                StrategicMove[] options = new StrategicMove[]{StrategicMove.DoubleElseHit,StrategicMove.Stand,StrategicMove.Hit} ;
+                StrategicMove m = options[random_.nextInt(3)] ;
+                if(softTotalStrategies.containsKey(i))
+                {
+                    softTotalStrategies.get(i).put(c,m) ;
+                }
+                else
+                {
+                    HashMap<Card,StrategicMove> csm = new HashMap<Card,StrategicMove>() ;
+                    csm.put(c,m) ;
+                    softTotalStrategies.put(i,csm) ;
+                }
+            }
+        }
+
+        // Randomly initialize hard totals with stand, hit or double
+        //   outter loop = player hand
+        for(int i = 4 ; i < 22 ; i++)
+        {
+            // inner loop = dearler upcard
+            for(int j = 2 ; j < 12 ; j++)
+            {
+                Card c = BlackjackStrategyStatic.getCardForConfigValue(j) ;
+                StrategicMove[] options = new StrategicMove[]{StrategicMove.DoubleElseHit,StrategicMove.Stand,StrategicMove.Hit} ;
+                StrategicMove m = options[random_.nextInt(3)] ;
+                if(hardTotalStrategies.containsKey(i))
+                {
+                    hardTotalStrategies.get(i).put(c,m) ;
+                }
+                else
+                {
+                    HashMap<Card,StrategicMove> csm = new HashMap<Card,StrategicMove>() ;
+                    csm.put(c,m) ;
+                    hardTotalStrategies.put(i,csm) ;
+                }
+            }
+        }
+
+        // Randomly initialize surrender with yes or no
+        //   outter loop = player hand
+        for(int i = 4 ; i < 22 ; i++)
+        {
+            // inner loop = dearler upcard
+            for(int j = 2 ; j < 12 ; j++)
+            {
+                Card c = BlackjackStrategyStatic.getCardForConfigValue(j) ;
+                StrategicMove m = (random_.nextBoolean() ? StrategicMove.Surrender : StrategicMove.NoSurrender) ;
+                if(surrenderStrategies.containsKey(i))
+                {
+                    surrenderStrategies.get(i).put(c,m) ;
+                }
+                else
+                {
+                    HashMap<Card,StrategicMove> csm = new HashMap<Card,StrategicMove>() ;
+                    csm.put(c,m) ;
+                    surrenderStrategies.put(i,csm) ;
+                }
+            }
+        }
+        }
+        catch(Exception e)
+        {
+            System.err.println(e.getMessage()) ;
+            System.exit(1) ;
+        }
+        boolean takeInsurance = random_.nextBoolean() ;
+        boolean takeEvenMoney = random_.nextBoolean() ;
+
+        return new BlackjackStrategy(pairsStrategies,softTotalStrategies,hardTotalStrategies,surrenderStrategies,takeInsurance,takeEvenMoney) ;
     }
 
     public Blackjack.Move getHandDecision(BlackjackRules r, BlackjackHand h, Card dealerUpcard) throws Exception
@@ -150,7 +368,7 @@ public class BlackjackStrategy
             Integer pairValue = h.getHandValue() ;
             pairValue = (pairValue == 12 ? pairValue = 1 : pairValue / 2) ;
 
-            StrategicMove m = pairStrategies_.get(pairValue).get(normalizedDealerUpcard) ;
+            BlackjackStrategy.StrategicMove m = pairStrategies_.get(pairValue).get(normalizedDealerUpcard) ;
             switch(m)
             {
                 case Split :
@@ -249,210 +467,53 @@ public class BlackjackStrategy
         return move ;
     }
 
-    public static BlackjackStrategy createStrategyFromFile(String filename) throws Exception
+    public double compare(BlackjackStrategy other)
     {
-        BlackjackStrategy s = null ;
-
-        // first try to find if we've already got this strategy object built
-        if(strategies_.containsKey(filename))
+        int i = 0, j = 0 ;
+        for(Integer key : pairStrategies_.keySet())
         {
-            s = strategies_.get(filename) ;
+            for( Card c : pairStrategies_.get(key).keySet() )
+            {
+                if(pairStrategies_.get(key).get(c) == other.pairStrategies_.get(key).get(c))
+                {
+                    i++ ;
+                }
+                j++ ;
+            }
         }
-        else
+        for(Integer key : softTotalStrategies_.keySet())
         {
-            File sFile = new File(filename) ;
-            BufferedReader br = new BufferedReader(new FileReader(sFile)) ;
-
-            String fileContents = new String() ;
-            String fileLine ;
-            while((fileLine = br.readLine()) != null)
+            for( Card c : softTotalStrategies_.get(key).keySet() )
             {
-                fileLine = fileLine.replaceAll("\\s", "");
-                if(fileLine.indexOf('#') >= 0)
+                if(softTotalStrategies_.get(key).get(c) == other.softTotalStrategies_.get(key).get(c))
                 {
-                    fileLine = fileLine.substring(0,fileLine.indexOf('#')) ;
+                    i++ ;
                 }
-                fileContents += fileLine ;
+                j++ ;
             }
-
-            String[] pieces = fileContents.split("}") ;
-            String pairs = null, soft = null, hard = null, sur  = null;
-            for(int i = 0 ; i < pieces.length ; ++i )
-            {
-                if(pieces[i].contains(PAIRS_STRING))
-                {
-                    pairs = pieces[i].substring(pieces[i].indexOf("{")+1) ;
-                }
-                else if(pieces[i].contains(SOFT_TOTAL_STRING))
-                {
-                    soft = pieces[i].substring(pieces[i].indexOf("{")+1) ;
-                }
-                else if(pieces[i].contains(HARD_TOTAL_STRING))
-                {
-                    hard = pieces[i].substring(pieces[i].indexOf("{")+1) ;
-                }
-                else if(pieces[i].contains(SURRENDER_STRING))
-                {
-                    sur = pieces[i].substring(pieces[i].indexOf("{")+1) ;
-                }
-            }
-            Map<Integer,Map<Card,StrategicMove>>     pairsStrategies = null ;
-            Map<Integer,Map<Card,StrategicMove>> softTotalStrategies = null ;
-            Map<Integer,Map<Card,StrategicMove>> hardTotalStrategies = null ;
-            Map<Integer,Map<Card,StrategicMove>> surrenderStrategies = null ;
-            if( pairs != null )
-            {
-                pairsStrategies = processMoveConfiguration(pairs) ;
-            }
-            else
-            {
-                throw new Exception("Invalid config: missing pairs configuation") ;
-            }
-            if( soft != null )
-            {
-                softTotalStrategies = processMoveConfiguration(soft) ;
-            }
-            else
-            {
-                throw new Exception("Invalid config: missing soft totals configuration") ;
-            }
-            if( hard != null )
-            {
-                hardTotalStrategies = processMoveConfiguration(hard) ;
-            }
-            else
-            {
-                throw new Exception("Invalid config: missing hard totals configuration") ;
-            }
-            if( sur != null )
-            {
-                surrenderStrategies = processMoveConfiguration(sur) ;
-            }
-            else
-            {
-                throw new Exception("Invalid config: missing surrender configuration") ;
-            }
-            s = new BlackjackStrategy(pairsStrategies,
-                                      softTotalStrategies,
-                                      hardTotalStrategies,
-                                      surrenderStrategies,
-                                      false,
-                                      false) ;
-            strategies_.put(filename,s) ;
         }
-        return s ;
+        for(Integer key : hardTotalStrategies_.keySet())
+        {
+            for( Card c : hardTotalStrategies_.get(key).keySet() )
+            {
+                if(hardTotalStrategies_.get(key).get(c) == other.hardTotalStrategies_.get(key).get(c))
+                {
+                    i++ ;
+                }
+                j++ ;
+            }
+        }
+        for(Integer key : surrenderStrategies_.keySet())
+        {
+            for( Card c : surrenderStrategies_.get(key).keySet() )
+            {
+                if(surrenderStrategies_.get(key).get(c) == other.surrenderStrategies_.get(key).get(c))
+                {
+                    i++ ;
+                }
+                j++ ;
+            }
+        }
+        return (1.0d * i)/j ;
     }
-
-    /*
-     * Helper function
-     */
-    private static Map<Integer, Map<Card, StrategicMove>> processMoveConfiguration(String s) throws Exception
-    {
-        Map<Integer, Map<Card, StrategicMove>> ret = new HashMap<Integer, Map<Card, StrategicMove>>() ;
-
-        String[] lines = s.split(";") ;
-        for( int i = 0 ; i < lines.length ; ++i )
-        {
-            String[] components = lines[i].split(":") ;
-
-            if(components.length != 2)
-            {
-                throw new Exception("Invalid config line: " + lines[i] + " expecting PlayerCard:Option,Option,...") ;
-            }
-
-            Integer playerHandValue = Integer.parseInt(components[0]);
-            String [] dealerUpcardOptions = components[1].split(",") ;
-            if(dealerUpcardOptions.length != 10)
-            {
-                throw new Exception("Invalid config line: " + lines[i] + " expecting 10 dealer options") ;
-            }
-
-            for( int j = 0 ; j < dealerUpcardOptions.length ; ++j )
-            {
-
-                // Insert it into the array, deaer upcard
-                if(ret.containsKey(playerHandValue))
-                {
-                    ret.get(playerHandValue).put(getCardForConfigValue(j+2),getStrategicMoveForConfigValue(dealerUpcardOptions[j].charAt(0))) ;
-                }
-                else
-                {
-                    Map<Card, StrategicMove> m = new HashMap<Card,StrategicMove>() ;
-                    m.put(getCardForConfigValue(j+2),getStrategicMoveForConfigValue(dealerUpcardOptions[j].charAt(0))) ;
-                    ret.put(playerHandValue,m) ;
-                }
-            }
-        }
-        return ret ;
-    }
-
-    public static Card getCardForConfigValue(Integer i) throws Exception
-    {
-        Card c = null ;
-
-        switch(i.intValue())
-        {
-            case 2:
-                c = Card.valueOf(Card.Rank.Deuce,Card.Suit.Spades) ;
-                break ;
-            case 3:
-                c = Card.valueOf(Card.Rank.Three,Card.Suit.Spades) ;
-                break ;
-            case 4:
-                c = Card.valueOf(Card.Rank.Four,Card.Suit.Spades) ;
-                break ;
-            case 5:
-                c = Card.valueOf(Card.Rank.Five,Card.Suit.Spades) ;
-                break ;
-            case 6:
-                c = Card.valueOf(Card.Rank.Six,Card.Suit.Spades) ;
-                break ;
-            case 7:
-                c = Card.valueOf(Card.Rank.Seven,Card.Suit.Spades) ;
-                break ;
-            case 8:
-                c = Card.valueOf(Card.Rank.Eight,Card.Suit.Spades) ;
-                break ;
-            case 9:
-                c = Card.valueOf(Card.Rank.Nine,Card.Suit.Spades) ;
-                break ;
-            case 10:
-                c = Card.valueOf(Card.Rank.Ten,Card.Suit.Spades) ;
-                break ;
-            case 11:
-                c = Card.valueOf(Card.Rank.Ace,Card.Suit.Spades) ;
-                break ;
-            default:
-                throw new Exception("Unkown card") ;
-        }
-        return c ;
-    }
-
-    private static StrategicMove getStrategicMoveForConfigValue(char c)
-    {
-        switch(c)
-        {
-            case 'Y':
-                return StrategicMove.Split ;
-            case 'N':
-                return StrategicMove.DontSplit ;
-            case 'A':
-                return StrategicMove.SplitIfDouble ;
-            case 'S':
-                return StrategicMove.Stand ;
-            case 'H':
-                return StrategicMove.Hit ;
-            case 'D':
-                return StrategicMove.DoubleElseHit ;
-            case 'X':
-                return StrategicMove.DoubleElseStand ;
-            case 'C':
-                return StrategicMove.Surrender ;
-            case 'F':
-                return StrategicMove.NoSurrender ;
-        }
-        // useless
-        System.out.println("MISSED A STRATEGIC CASE") ;
-        return StrategicMove.Stand ;
-    }
-}
+} ;
