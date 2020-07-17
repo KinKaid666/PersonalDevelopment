@@ -236,7 +236,33 @@ public class BlackjackStrategyStatic extends BlackjackStrategy
         return c ;
     }
 
-    private static BlackjackStrategy.StrategicMove getStrategicMoveForConfigValue(char c) throws Exception
+    public static char getConfigValueForStrategicMove(BlackjackStrategy.StrategicMove m) throws Exception
+    {
+        switch(m)
+        {
+            case Split:
+                return 'Y' ;
+            case DontSplit:
+                return 'N' ;
+            case SplitIfDouble:;
+                return 'A' ;
+            case Stand:;
+                return 'S' ;
+            case Hit:;
+                return 'H' ;
+            case DoubleElseHit:;
+                return 'D' ;
+            case DoubleElseStand:;
+                return 'X' ;
+            case Surrender:;
+                return 'C' ;
+            case NoSurrender:;
+                return 'F' ;
+        }
+        // useless
+        throw new Exception("Unknown") ;
+    }
+    public static BlackjackStrategy.StrategicMove getStrategicMoveForConfigValue(char c) throws Exception
     {
         switch(c)
         {

@@ -208,27 +208,41 @@ public class BlackjackStrategy
      */
     public void printStrategy(PrintStream o)
     {
-        o.println("*** Dumping Configuration" ) ; 
-        o.println("    *** Dumping pair strategies" ) ; 
+        o.printf("Pairs {\n" ) ; 
         BlackjackStrategyStatic.printStrategyHelper(pairStrategies_,o) ;
-        o.println("    *** Dumping soft totals strategies" ) ; 
+        o.printf("}\nSoft Totals {\n" ) ; 
         BlackjackStrategyStatic.printStrategyHelper(softTotalStrategies_,o) ;
-        o.println("    *** Dumping hard totals strategies" ) ; 
+        o.printf("}\nHard Totals {\n" ) ; 
         BlackjackStrategyStatic.printStrategyHelper(hardTotalStrategies_,o) ;
-        o.println("    *** Dumping surrender strategies" ) ; 
+        o.printf("}\nSurrender {\n" ) ; 
         BlackjackStrategyStatic.printStrategyHelper(surrenderStrategies_,o) ;
-        o.println("    takeInsurance = " + (takeInsurance_? "true":"false")) ;
-        o.println("    takeEvenMoney = " + (takeEvenMoney_? "true":"false")) ;
+        o.printf("}\n" ) ; 
     }
 
     public static void printStrategyHelper(HashMap<Integer, HashMap<Card, StrategicMove>> m, PrintStream o)
     {
-        for(Integer key : m.keySet())
+        ArrayList<Integer> keys = new ArrayList<Integer>(m.keySet()) ;
+        Collections.sort(keys) ;
+        //
+        // Print header row
+        o.printf("      # 2,3,4,5,6,7,8,9,T,A\n") ;
+        for(Integer key : keys)
         {
+            int x = 0 ;
+            o.printf("%7d:", key) ;
             for( Card c : m.get(key).keySet() )
             {
-                o.println("        PlayerHandValue = " + key + ", Dealer Upcard = " + c + ",\tMove = " + m.get(key).get(c)) ;
+                try
+                {
+                    o.printf("%s%s",(x != 0 ? ",":""), BlackjackStrategyStatic.getConfigValueForStrategicMove(m.get(key).get(c))) ;
+                }
+                catch(Exception e)
+                {
+                    System.err.println("Catch exception: " + e.getMessage()) ;
+                }
+                x++ ;
             }
+            o.printf("\n") ;
         }
     }
 

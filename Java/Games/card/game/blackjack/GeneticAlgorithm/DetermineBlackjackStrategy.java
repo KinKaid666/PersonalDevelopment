@@ -99,8 +99,6 @@ public class DetermineBlackjackStrategy
                 BlackjackStrategy a = BlackjackEvolutionObject.pickStrategy(strategies, r.nextDouble()) ;
                 BlackjackStrategy b = BlackjackEvolutionObject.pickStrategy(strategies, r.nextDouble()) ;
 
-                //System.out.printf("\t\tA.fitness = %.3f, B.fitness = %.3f, A vs. B = %.2f\n", a.getFitness(), b.getFitness(), a.compare(b) ) ;
-
                 // crossover creates new strategy object that zeros it's statistics
                 BlackjackStrategy c = a.crossover(b) ;
 
@@ -115,6 +113,13 @@ public class DetermineBlackjackStrategy
         }
         System.out.println("Best Strategy...") ;
         bestStrategy.printStrategy(System.out) ;
+        try
+        {
+            System.out.printf("Best Strategy vs. Book = %.3f%%\n", bestStrategy.compare(BlackjackStrategyStatic.createStrategyFromFile("/Users/ericferguson/PersonalDevelopment/Java/Games/card/game/blackjack/Strategies/perfect.stg"))*100.0d) ;
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage()) ;
+        }
     }
-
 }
