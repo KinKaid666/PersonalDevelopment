@@ -31,7 +31,7 @@ public class BlackjackSimulator
                                                    false, // resplit aces
                                                    true,  // double after splitj
                                                    false, // double on only 10 or 11
-                                                   true   // insurance
+                                                   false  // insurance
                                                 ) ;
 
         List<BlackjackPlayer> players = new LinkedList<BlackjackPlayer>() ;

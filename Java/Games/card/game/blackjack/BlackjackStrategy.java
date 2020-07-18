@@ -242,7 +242,7 @@ public class BlackjackStrategy
                 }
                 x++ ;
             }
-            o.printf("\n") ;
+            o.printf(";\n") ;
         }
     }
 
@@ -265,7 +265,7 @@ public class BlackjackStrategy
             for(int j = 2 ; j < 12 ; j++)
             {
                 Card c = BlackjackStrategyStatic.getCardForConfigValue(j) ;
-                StrategicMove m = (random_.nextBoolean() ? StrategicMove.Split : StrategicMove.Stand ) ;
+                StrategicMove m = (random_.nextBoolean() ? StrategicMove.Split : StrategicMove.DontSplit ) ;
                 if(pairsStrategies.containsKey(i))
                 {
                     pairsStrategies.get(i).put(c,m) ;

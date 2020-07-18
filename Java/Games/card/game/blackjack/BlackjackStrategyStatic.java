@@ -165,7 +165,7 @@ public class BlackjackStrategyStatic extends BlackjackStrategy
 
             if(components.length != 2)
             {
-                throw new Exception("Invalid config line: " + lines[i] + " expecting PlayerCard:Option,Option,...") ;
+                throw new Exception("Invalid config line: " + lines[i] + " expecting PlayerCard:Option,Option,...;") ;
             }
 
             Integer playerHandValue = Integer.parseInt(components[0]);
@@ -244,19 +244,19 @@ public class BlackjackStrategyStatic extends BlackjackStrategy
                 return 'Y' ;
             case DontSplit:
                 return 'N' ;
-            case SplitIfDouble:;
+            case SplitIfDouble:
                 return 'A' ;
             case Stand:;
                 return 'S' ;
             case Hit:;
                 return 'H' ;
-            case DoubleElseHit:;
+            case DoubleElseHit:
                 return 'D' ;
-            case DoubleElseStand:;
+            case DoubleElseStand:
                 return 'X' ;
-            case Surrender:;
+            case Surrender:
                 return 'C' ;
-            case NoSurrender:;
+            case NoSurrender:
                 return 'F' ;
         }
         // useless
