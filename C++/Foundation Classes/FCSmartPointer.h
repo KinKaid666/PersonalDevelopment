@@ -14,8 +14,8 @@ public:
     /*
     ** Other Constructors
     */
-    P(T *p) { Assign(p) ; }
-    P( const P<T> &p ) { Assign(p.ptr_) ; }
+    P(T *p) : ptr_(0) { Assign(p) ; }
+    P( const P<T> &p ) : ptr_(0) { Assign(p.ptr_) ; }
 
     /*
     ** Assigning a 'new' pointer
@@ -42,7 +42,8 @@ protected:
             p->addReference() ;
         if( ptr_ && 0 == ptr_->removeReference() )
         {
-            delete ptr_ ; ptr_ = NULL ;
+            delete ptr_ ;
+            ptr_ = NULL ;
         }
         ptr_ = p ;
     }
