@@ -29,7 +29,7 @@ class PlayBlackjack
             }
             else
             {
-                s = BlackjackStrategyStatic.createStrategyFromFile(args[2]) ;
+                s = BlackjackStrategyStatic.createStrategyFromFile(args[1]) ;
                 s.printStrategy(System.out) ;
             }
         }
