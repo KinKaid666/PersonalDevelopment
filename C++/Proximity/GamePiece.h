@@ -9,8 +9,8 @@ class GamePiece
 public:
     enum Color
     {
-	RED,
-	BLUE
+        RED,
+        BLUE
     } ;
 
     GamePiece( Color color, int value, int min, int max )
@@ -20,22 +20,22 @@ public:
 
     void ApplyAdjustment( int adj )
     {
-	value_ += adj ;
-	if( value_ < min_ ) value_ = min_ ;
-	if( value_ > max_ ) value_ = max_ ;
+        value_ += adj ;
+        if( value_ < min_ ) value_ = min_ ;
+        if( value_ > max_ ) value_ = max_ ;
     }
 
-    void SetColor( Color color )
-    { color_ = color ; }
+    void SetColor( Color color ) { color_ = color ; }
 
     Color GetColor() { return color_ ; }
     int   GetArmies(){ return value_ ; }
 
     string asString() ;
     string Print() ;
+
     /* give me another */
-    GamePiece* dup()
-    { return new GamePiece(color_, value_, min_, max_) ; } 
+    GamePiece* dup() { return new GamePiece(color_, value_, min_, max_) ; } 
+
 private:
     Color color_ ;
     int value_ ;
