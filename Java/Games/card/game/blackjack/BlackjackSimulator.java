@@ -47,7 +47,10 @@ public class BlackjackSimulator
             try
             {
                 game_.play() ;
-                game_.shuffle() ;
+                if( game_.reshuffleNeeded() )
+                {
+                    game_.shuffle() ;
+                }
             }
             catch (Exception e)
             {

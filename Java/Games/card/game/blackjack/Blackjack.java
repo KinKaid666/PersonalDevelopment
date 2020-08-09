@@ -44,11 +44,11 @@ public class Blackjack
     }
 
     public void setVerbose(boolean verbose) { verbose_ = verbose ; }
+    public void shuffle() { cardShoe_.reshuffle() ; }
+    public boolean reshuffleNeeded() { return cardShoe_.reshuffleNeeded() ; }
 
     public void play() throws Exception
     {
-        while( !cardShoe_.reshuffleNeeded() )
-        {
             // Deal - will return a hand for each player and the dealer's hand last
             BlackjackHand[] temphands = deal() ;
 
@@ -230,22 +230,21 @@ public class Blackjack
                         weights[j] = 1.5 ;
                     }
 
-                    if(playerHands.get(j).isSurrendered())
-                    {
-                        weights[j] = 0.5 ;
-                    }
-
+                if(playerHands.get(j).isSurrendered())
+                {
+                    weights[j] = 0.5 ;
                 }
-                // record the outcome
-                p.getStrategy().recordHandList(playerHands,dealerHand.getCard(0),outcomes,weights) ;
-                ++i ;
+
             }
-            if(verbose_)
-            {
-                System.out.println() ;
-            }
-            hands_++ ;
+            // record the outcome
+            p.getStrategy().recordHandList(playerHands,dealerHand.getCard(0),outcomes,weights) ;
+            ++i ;
         }
+        if(verbose_)
+        {
+            System.out.println() ;
+        }
+        hands_++ ;
     }
 
     private static BlackjackHand.Outcome determineOutcome(BlackjackHand player, BlackjackHand dealer)
@@ -281,8 +280,4 @@ public class Blackjack
         return hands ;
     }
 
-    public void shuffle()
-    {
-        cardShoe_.reshuffle() ;
-    }
 }

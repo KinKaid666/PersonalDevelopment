@@ -109,7 +109,7 @@ public class DetermineBlackjackStrategy
                 newStrategies.add(new BlackjackEvolutionObject(c)) ;
             }
             strategies = newStrategies ;
-            System.out.printf("After %d generations, the max fitness %.3f\n", i, bestStrategy.getFitness()) ;
+            System.out.printf("After %d generations, the max fitness %.3f\n", i+1, bestStrategy.getFitness()) ;
         }
         System.out.println("Best Strategy...") ;
         bestStrategy.printStrategy(System.out) ;
