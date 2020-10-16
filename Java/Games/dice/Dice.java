@@ -35,6 +35,27 @@ public class Dice
         }
 
         diceValue_ = value ;
+        recordRoll(value) ;
+        return diceValue_ ;
+    }
+
+    //
+    // Roll x of the dice
+    public int roll(int x)
+    {
+        int value = 0 ;
+        for( int i = 0 ; i < x && i < dice_.size() ; i++ )
+        {
+            value += dice_.get(i).roll() ;
+        }
+
+        diceValue_ = value ;
+        recordRoll(value) ;
+        return diceValue_ ;
+    }
+
+    private void recordRoll(int value)
+    {
 
         if(stats_.containsKey(diceValue_))
         {
@@ -44,9 +65,8 @@ public class Dice
         }
         else
         {
-                stats_.put(diceValue_,1) ;
+            stats_.put(diceValue_,1) ;
         }
-        return diceValue_ ;
     }
 
     //
