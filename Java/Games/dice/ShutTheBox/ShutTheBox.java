@@ -8,6 +8,7 @@ import java.util.Collections ;
 import java.time.Instant ;
 import java.time.Duration ;
 
+
 public class ShutTheBox
 {
 /*
@@ -60,12 +61,14 @@ public class ShutTheBox
         //   for big numbers first ({10} before {1,9} before {1,2,7} before {1,2,3,4})
         for(int x = 0 ; x < allOptions.size() ; x++)
         {
-            for(int i = 0 ; i < allOptions.get(x).size() ; i++)
+            for(int i = 0 ; i < allOptions.get(x).size() - 1 ; i++)
             {
                 for(int j = i + 1 ; j < allOptions.get(x).size() ; j++ )
                 {
                     // swap
-                    if(allOptions.get(x).get(i).size() > allOptions.get(x).get(j).size())
+                    if((allOptions.get(x).get(i).size() > allOptions.get(x).get(j).size()) ||
+                          (allOptions.get(x).get(i).size() == allOptions.get(x).get(j).size() &&
+                           toString(allOptions.get(x).get(i)).compareTo(toString(allOptions.get(x).get(j)))> 0))
                     {
                         ArrayList<Integer> temp = allOptions.get(x).get(j) ;
                         allOptions.get(x).remove(j) ;
@@ -77,7 +80,26 @@ public class ShutTheBox
                 }
             }
         }
+
+        for(ArrayList<ArrayList<Integer>> arrayOfOptions : allOptions )
+        {
+            for( ArrayList<Integer> options : arrayOfOptions )
+            {
+                Collections.sort(options) ;
+            }
+        }
         return allOptions ;
+    }
+
+    // helper
+    private static String toString(ArrayList<Integer> x)
+    {
+        StringBuffer sb = new StringBuffer() ;
+        for(Integer i : x)
+        {
+            sb.append(i) ;
+        }
+        return sb.toString() ;
     }
 
     public static ArrayList< ArrayList<Integer>> sumset( ArrayList<Integer> set, Integer sum )
@@ -264,19 +286,19 @@ public class ShutTheBox
 /*
         {
             int i = 1 ;
-            for(arraylist<arraylist<integer>> arrayofoptions : alloptions_ )
+            for(ArrayList<ArrayList<Integer>> arrayOfOptions : allOptions_ )
             {
-                system.out.printf("sumset that total %d from set(1..10)\n", i++) ;
+                System.out.printf("sumset that total %d from set(1..10)\n", i++) ;
 
                 int j = 1 ;
-                for( arraylist<integer> options : arrayofoptions )
+                for( ArrayList<Integer> options : arrayOfOptions )
                 {
-                    system.out.printf("\t%d = {", j++) ;
-                    for( integer option : options )
+                    System.out.printf("\t%d = {", j++) ;
+                    for( Integer option : options )
                     {
-                        system.out.printf("%d,", option) ;
+                        System.out.printf("%d,", option) ;
                     }
-                    system.out.println("},") ;
+                    System.out.println("},") ;
                 }
             }
         }
