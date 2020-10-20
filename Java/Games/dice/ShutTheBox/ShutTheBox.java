@@ -154,11 +154,11 @@ public class ShutTheBox
     }
 
     // Create a game of shut the box
-    //   oneDiceConfig is when you witch to one die
-    //         6 = when 7-10 are closed
-    //         5 = when 6-10 are closed
-    //         ...
-    //         0 = when 1-10 are closed (i.e. never switch
+    //   oneDiceConfig is when you switch to one die
+    //       6 = when score is <= 6
+    //       5 = when score is <= 5
+    //       ...
+    //       0 = never switch to one die
     public ShutTheBox(Integer oneDiceConfig)
     {
         oneDiceConfig_ = oneDiceConfig ;
@@ -256,11 +256,11 @@ public class ShutTheBox
 
     public int play()
     {
-        int i = 0 ;
+        int i = 1 ;
         while(true)
         {
             int roll ;
-            if(onlyXOrLess(oneDiceConfig_))
+            if(score() <= oneDiceConfig_)
             {
                 roll = dice_.roll(1) ;
             }
@@ -269,13 +269,13 @@ public class ShutTheBox
                 roll = dice_.roll() ;
             }
 
-            //System.out.printf("Roll = %2d ", roll) ;
-            if(!move(roll))
+            //System.out.printf("Roll = %2d; ", roll) ;
+            if(score() == 0 || !move(roll))
             {
                 //System.out.println() ;
                 break ;
             }
-            //System.out.println(getBoard()) ;
+            //System.out.printf("Board = [%-27s], score = %2d\n", getBoard(), score()) ;
             i++ ;
         }
         return i ;
@@ -351,25 +351,29 @@ public class ShutTheBox
         }
         Instant end = Instant.now();
 
-        //
-        // can't score 55 or 54
-        int maxScore = 53 ;
-        for( int i = 0 ; i <= maxScore ; i++ )
+        // don't display stats with 1 game
+        if(numGames > 1)
         {
-            if(scores.containsKey(i))
+            //
+            // can't score 55 or 54
+            int maxScore = 53 ;
+            for( int i = 0 ; i <= maxScore ; i++ )
             {
-                System.out.printf("%" + String.valueOf(maxScore).length() + "d = %," + (String.valueOf(numGames).length()+2) + "d / %5.2f%%\n", i, scores.get(i), scores.get(i)*100.00 / numGames) ;
+                if(scores.containsKey(i))
+                {
+                    System.out.printf("%" + String.valueOf(maxScore).length() + "d = %," + (String.valueOf(numGames).length()+2) + "d / %5.2f%%\n", i, scores.get(i), scores.get(i)*100.00 / numGames) ;
+                }
+                else
+                {
+                    System.out.printf("%" + String.valueOf(maxScore).length() +"d = %," + (String.valueOf(numGames).length()+2) + "d / %5.2f%%\n", i, 0, 0.0) ;
+                }
             }
-            else
-            {
-                System.out.printf("%" + String.valueOf(maxScore).length() +"d = %," + (String.valueOf(numGames).length()+2) + "d / %5.2f%%\n", i, 0, 0.0) ;
-            }
+            System.out.printf("Timer = %s\n", Duration.between(start, end) ) ;
+            System.out.printf("After playing %,d games, average score was %.2f with an average of %.2f moves per game\n",
+                    numGames,
+                    (totalScore * 1.0) / games,
+                    (totalMoves * 1.0) / games) ;
         }
-        System.out.printf("Timer = %s\n", Duration.between(start, end) ) ;
-        System.out.printf("After playing %,d games, average score was %.2f with an average of %.2f moves per game\n",
-                numGames,
-                (totalScore * 1.0) / games,
-                (totalMoves * 1.0) / games) ;
     }
 }
 
