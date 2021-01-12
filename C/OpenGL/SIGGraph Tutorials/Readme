@@ -1,0 +1,39 @@
+11/14/01
+
+PLEASE NOTE that I have modified both the projection and transformation
+tutorials in such a way that the original object displayed, i.e., the 
+porsche for transformation and Al Capone for projection, are displayed
+at approximately the same size under all projections.  This was done
+so that it will be easier for you to do direct comparisons of effects when
+you run side-by-side versions of the same tutorial using different projection
+types (as in homework2)!
+
+==============================================================================
+This directory contains Nate Robins (http://www.xmission.com/~nate/opengl.html)
+OpenGL tutorials and source.  These have been used in interactive SIGGRAPH 
+courses on OpenGL for the past few years.  These are written in C.
+
+To use, download the executables and the data directory into your account.
+
+These are very nice tutorials that allow the user to interactive look at the
+affects of varying parameters to openGL calls.  When executed, a snippet of 
+code is presented in one of the windows.  Each of the parameters shown in
+green can be modified by putting the cursor over the parameter and holding
+down the left mouse button and moving up and down.  The effect appears 
+immediately in the graphics windows.
+
+The right mouse button lets you check out other things, such as different
+models and different modeling techniques.
+
+If you want to see the source, that is available as well as a Makefile.
+To compile, simply type 
+
+	make PROG=xxxx
+
+where "xxxx" is the name of the .c file you want to use, i.e., make "PROG=foo"
+will use "foo.c" to create "foo".
+
+If there is no executable file for a particular c file, that means that that
+is a helper file and is used one or more of the tutorials.  For example, 
+"glm.c" is a program that reads model information.  The "data" directory 
+supplies model data, required by some of the tutorials.

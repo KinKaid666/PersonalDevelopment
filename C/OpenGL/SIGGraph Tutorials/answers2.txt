@@ -1,0 +1,424 @@
+Eric Ferguson 
+
+Part 1 - Transformations
+
+* Using Parallel Projection (glOrtho) }
+
+  1. How does the image change if you change the x argument of the translate
+     parameter list to negative? to positive?
+
+     - The image translates left.
+     + The image translates right.
+
+  2. How does the image change if you change the y argument of the translate
+     parameter list to negative? to positive?
+
+     - The image translates down.
+     + The image translates up.
+
+  3. How does the image change if you change the z argument of the translate
+     parameter list to negative? to positive?
+
+     - No changes, unless translated outside the clipping region.
+     + No changes, unless translated outside the clipping region.
+
+  4. How does the image change if you change the angle argument of the
+     rotation parameter list to negative? to positive? (rotation about Y axis)
+
+     - The image rotates clockwise based on a top-down perspective.
+     + The image rotates counterclockwise based on a top-down perspective.
+
+  5. How does the image change if you change the angle argument of the
+     rotation parameter list to negative while the rotate about vector is
+     set to (0.0, 0.0, 1.0)? to positive? (rotation about Z axis)
+
+     - The image rotates clockwise based on a forward-to-back perspective.
+     + The image rotates counterclockwise based on a forward-to-back 
+       perspective.
+
+  6. How does the image change if you change the angle argument of the
+     rotation parameter list to negative while the rotate about vector is
+     set to (1.0, 0.0, 0.0)? to positive? (rotation about X axis)
+
+     - The image rotates clockwise based on a right-to-left perspective.
+     + The image rotates counterclockwise based on a right-to-left perspective.
+
+  7. How does the image change if you change the angle argument of the
+     rotation parameter list to negative while the rotate about vector is
+     set to (1.0, 1.0, 1.0)? to positive?
+
+     - The bottom right of the image rotates up and towards the top left.
+     + The top left of the image rotates down and towards the bottom right.
+
+  8. How does the image change if you make the x scale factor smaller?
+     larger?
+
+     smaller - The image gets scaled smaller in the x (left-right) dimension.
+     larger  - The image gets scaled larger in the x (left-right) dimension.
+
+  9. How does the image change if you make the y scale factor smaller?
+     larger?
+
+     smaller - The image gets scaled smaller in the y (top-bottom) dimension.
+     larger  - The image gets scaled larger in the y (top-bottom) dimension.
+
+ 10. How does the image change if you make the z scale factor smaller?
+     larger?
+
+     smaller - The image does not change (unless it breaches the clipping 
+	       area).
+     larger  - The image does not change (unless it breaches the clipping 
+	       area).
+
+ 11. Using glTranslatef( 0.1, 0.1, -.5) and glRotatef(30.0, 0.0, 0.0, 1.0),
+     what, if any difference do you see in the resulting image, if the order
+     of these two commands is swapped? (See right mouse button menu or type
+     "s".)
+
+     No difference is noticeable, order doesn't seem to matter.
+
+* Using Perspective Projection (gluPerspective)
+
+  1. How does the image change if you change the x argument of the translate
+     parameter list to negative? to positive?
+
+     - The image translates left.  More accurately it looks as if the back of 
+       the image is translating slower than the front.
+     + The image translates right. More accurately it looks as if the back of 
+       the image is translating slower than the front.
+
+  2. How does the image change if you change the y argument of the translate
+     parameter list to negative? to positive?
+
+     - The image translates down, but the front of the image is translative 
+       faster than the back.
+     + The image translates up, but the front of the image is translating faster
+       than the back.
+
+  3. How does the image change if you change the z argument of the translate
+     parameter list to negative? to positive?
+
+     - The images gets smaller.
+     + The images gets larger.
+
+  4. How does the image change if you change the angle argument of the
+     rotation parameter list to negative? to positive? (rotation about Y axis)
+
+     - The image rotates clockwise based on a top down perspective.
+     + The image rotates counterclockwise based on a top down perspective.
+
+  5. How does the image change if you change the angle argument of the
+     rotation parameter list to negative while the rotate about vector is
+     set to (0.0, 0.0, 1.0)? to positive? (rotation about Z axis)
+
+     - The image rotates clockwise based on a forward-to-back perspective.
+     + The image rotates counterclockwise based on a forward-to-back 
+       perspective.
+
+  6. How does the image change if you change the angle argument of the
+     rotation parameter list to negative while the rotate about vector is
+     set to (1.0, 0.0, 0.0)? to positive? (rotation about X axis)
+
+     - The image rotates clockwise based on a right-to-left perspective.
+     + The image rotates counterclockwise based on a right-to-left perspective.
+
+  7. How does the image change if you change the angle argument of the
+     rotation parameter list to negative while the rotate about vector is
+     set to (1.0, 1.0, 1.0)? to positive?
+
+     - The bottom right of the image rotates up and towards the top left.
+     + The top left of the image rotates down and towards the bottom right.
+
+  8. How does the image change if you make the x scale factor smaller?
+     larger?
+
+     smaller - The image gets scaled smaller in the x (left-right) dimension.
+     larger  - The image gets scaled larger in the x (left-right) dimension.
+
+  9. How does the image change if you make the y scale factor smaller?
+     larger?
+
+     smaller - The image gets scaled smaller in the y (top-bottom) dimension.
+     larger  - The image gets scaled larger in the y (top-bottom) dimension.
+
+ 10. How does the image change if you make the z scale factor smaller?
+     larger?
+
+     smaller - It appears that the image translating away from our view.
+     larger  - It appears that the image translating towards our view.
+
+ 11. Using glTranslatef( 0.1, 0.1, -.5) and glRotatef(30.0, 0.0, 0.0, 1.0),
+     what, if any difference do you see in the resulting image, if the order
+     of these two commands is swapped? (See right mouse button menu or type
+     "s".)
+
+     The image is rotated 30 degrees counter clockwise, and when the 
+     commands are switched there is a difference, but it is very minimal and 
+     hard to describe.  The image is moved more towards the top left 
+     corner of the screen when the glRoatatef function is called first.
+
+Part 2 - Projections
+
+   * For Perspective Projection using gluPerspective:
+
+       1. How does the image change if you make the fovy argument of the
+          gluPerspective parameter list smaller? larger?
+
+	  smaller - The image is scaled larger in all dimensions.
+	  larger  - The image is scaled smaller in all dimensions.
+
+       2. How does the image change if you make the aspect argument of the
+          gluPerspective parameter list smaller? larger?
+
+	  smaller - The image is scaled larger in the x (left-right)
+		    dimension.
+	  larger  - The image is scaled smaller in the x 
+		    (left-right) dimension.
+
+       3. How does the image change if you make the zNear argument of the
+          gluPerspective parameter list smaller? larger?
+
+	  smaller - The image doesn't change (until you click the object).
+	  larger  - The image doesn't change (until you click the object).
+
+       4. How does the image change if you make the zFar argument of the
+          gluPerspective parameter list smaller? larger?
+
+	  smaller - The image doesn't change (until you click the object).
+	  larger  - The image doesn't change (until you click the object).
+
+       5. How does the image change of the x component of the eye triplet is
+          made larger? smaller?
+
+	  larger  - The image is rotated clockwise (from the top down
+		    perspective) and is scaled smaller in all 
+		    dimensions.
+	  smaller - The image is rotated counterclockwise (from the 
+		    top down perspective) and is scaled smaller in all
+		    dimensions.
+
+       6. How does the image change of the y component of the eye triplet is
+          made larger? smaller?
+	
+	  larger  - The image appears to be rotated counterclockwise (from the 
+		    right-to-left perspective) and scaled smaller in all 
+		    dimensions.
+	  smaller - The image appears to be rotated clockwise (from the 
+		    right-to-left perspective) and scaled smaller in all 
+		    dimensions.
+
+       7. How does the image change of the z component of the eye triplet is
+          made larger? smaller?
+
+	  larger  - The image is scaled smaller in all dimensions.
+	  smaller - The image is scaled larger in all dimensions.
+
+       8. How does the image change of the x component of the center triplet
+          is made larger? smaller?
+
+	  larger  - The image rotating left, around the camera.
+	  smaller - The image rotating right, around the camera.
+
+       9. How does the image change of the y component of the center triplet
+          is made larger? smaller?
+
+	  larger  - The image rotating down, around the camera.
+	  smaller - The image rotating up, around the camera.
+
+      10. How does the image change of the z component of the center triplet
+          is made larger? smaller?
+
+	  larger  - The image doesn't change, until you have passed the object.
+	  smaller - The image doesn't change, until you have passed the object.
+
+      11. How does the image change of the x component of the up triplet is
+          made larger? smaller?
+
+	  larger  - The images rotating counterclockwise.
+	  smaller - The images rotating clockwise.
+
+      12. How does the image change of the y component of the up triplet is
+          made larger? smaller?
+
+	  larger  - No change in the image.
+	  smaller - No change in the image until the number becomes negative, at
+		    which point the object flips upside down.
+
+      13. How does the image change of the z component of the up triplet is
+          made larger? smaller?
+
+	  larger  - No change in the image.
+	  smaller - No change in the image.
+
+   * For Perspective Projection using glFrustum
+
+       1. How does the image change if the left parameter of the glFrustum
+          call is made larger? smaller?
+
+	  larger  - The left side of the image is stretched left.
+	  smaller - The left side of the image is smashed right.
+
+       2. How does the image change if the right parameter of the glFrustum
+          call is made larger? smaller?
+
+	  larger  - The right side of the image is smashed left.
+	  smaller - The left side of the image is stretched right.
+
+       3. How does the image change if the bottom parameter of the glFrustum
+          call is made larger? smaller?
+
+	  larger  - The bottom of the image is stretched down.
+	  smaller - The bottom of the image is smashed up.
+
+       4. How does the image change if the top parameter of the glFrustum
+          call is made larger? smaller?
+
+	  larger  - The top of the image is smashed down.
+	  smaller - The top of the image is stretched up.
+
+       5. How does the image change if the near parameter of the glFrustum
+          call is made larger? smaller?
+
+	  larger  - The image is scaled larger in all dimensions.
+	  smaller - The image is scaled smaller in all dimensions.
+
+       6. How does the image change if the far parameter of the glFrustum
+          call is made larger? smaller?
+
+	  larger  - No change in the image.
+	  smaller - No change in the image, until you clip the object.
+
+       7. Do the gluLookAt parameters affect the image in the same way using
+          glFrustum as they do using gluPerspective? If not, in what way do
+          the causes and effects differ?
+
+	  Yes.
+
+   * For Parallel or Orthographic Projection:
+
+       1. How does the image change if the left parameter of the glOrtho
+          call is made larger? smaller?
+
+	  larger  - The left side of the image is stretched left.
+	  smaller - The left side of the image is smush ed right.
+
+       2. How does the image change if the right parameter of the glOrtho
+          call is made larger? smaller?
+
+	  larger  - The right side of the image is smush ed left.
+	  smaller - The left side of the image is stretched right.
+
+       3. How does the image change if the bottom parameter of the glOrtho
+          call is made larger? smaller?
+
+	  larger  - The bottom of the image is stretched down.
+	  smaller - The bottom of the image is smush ed up.
+
+       4. How does the image change if the top parameter of the glOrtho call
+          is made larger? smaller?
+
+	  larger  - The top of the image is smush ed down.
+	  smaller - The top of the image is stretched up.
+
+       5. How does the image change if the near parameter of the glOrtho
+          call is made larger? smaller?
+
+	  larger  - The image is scaled larger in all dimensions.
+	  smaller - The image is scaled smaller in all dimensions.
+
+       6. How does the image change if the far parameter of the glOrtho call
+          is made larger? smaller?
+
+	  larger  - No change in the image.
+	  smaller - No change in the image, until you clip the object.
+
+       7. Which of the following has a different effect in parallel
+          projection than it does in perspective projection? If the effect
+          is the same, indicate so. If it is different, tell how.
+
+             + How does the image change of the x component of the eye
+               triplet is made larger? smaller?
+
+	       larger  - The image rotates clockwise from the top down
+			 perspective.
+	       smaller - The image rotates counterclockwise from the top down
+			 perspective.
+
+             + How does the image change of the y component of the eye
+               triplet is made larger? smaller?
+
+	       larger  - The images rotates counterclockwise from a 
+			 left-to-right perspective.
+	       smaller - The images rotates clockwise from a 
+			 left-to-right perspective.
+
+             + How does the image change of the z component of the eye
+               triplet is made larger? smaller?
+
+	       larger  - No changed until clipping is encountered.
+	       smaller - No changed until clipping is encountered.
+
+             + How does the image change of the x component of the center
+               triplet is made larger? smaller?
+
+	       Same
+
+             + How does the image change of the y component of the center
+               triplet is made larger? smaller?
+
+	       Same
+
+             + How does the image change of the z component of the center
+               triplet is made larger? smaller?
+
+	       larger  - No change in the image.
+	       smaller - No change in the image.
+
+             + How does the image change of the x component of the up
+               triplet is made larger? smaller?
+
+	       Same
+
+             + How does the image change of the y component of the up
+               triplet is made larger? smaller?
+
+	       Same
+
+             + How does the image change of the z component of the up
+               triplet is made larger? smaller?
+
+	       Same
+
+
+   * For all types of projections:
+
+       1. The three triplets of the gluLookAt call specify which coordinate
+          system?
+
+	  World.
+
+       2. The eye triplet represents what in this coordinate system?
+
+	  World.
+
+       3. The center or point to triplet represents what in this coordinate
+          system?
+
+	  World.
+
+       4. The up triplet represents what in this coordinate system?
+
+	  World.
+
+       5. Which entity does gluPerspective, glFrustum, and glOrtho specify?
+
+	  They specify the clipping region.  The clipping region is then
+	  used to draw the device.
+
+       6. What is the main difference between parallel and perspective
+          projection?
+
+	  Scaling.  Perspective projection movements look more like real life,
+	  while parallel projects appear the camera is not getting closer,
+	  nor is it getting farther from the object in question.
+

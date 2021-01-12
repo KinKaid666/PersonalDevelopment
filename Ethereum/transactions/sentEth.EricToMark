@@ -1,0 +1,8 @@
+> eth.sendTransaction({from:eth.coinbase, to:"0xc000651Ad2622b705a53A8B04387F83C2e563d73", value: web3.toWei(0.001, "ether"), gas:30000})
+"0xe0b348c6bfdedd7937ddcf255f7c4db7efb1173d75d5f6e7abb35ab5003f4483"
+> eth.getBalance(eth.coinbase) ;
+12520920000000000
+> eth.getBalance(eth.coinbase) ;
+11079920000000000
+> 
+
