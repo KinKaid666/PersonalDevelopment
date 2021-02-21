@@ -60,7 +60,7 @@ public class BJStrategyTest
                             {
                                 try
                                 {
-                                    s = BlackjackStrategy.createStrategyFromFile( commandArgs.get(1) ) ;
+                                    s = BlackjackStrategyStatic.createStrategyFromFile( commandArgs.get(1) ) ;
                                 }
                                 catch(Exception e)
                                 {
@@ -80,7 +80,7 @@ public class BJStrategyTest
                             }
                             else
                             {
-                                s.printStrategy() ;
+                                s.printStrategy(System.out) ;
                             }
                             break ;
                         default:
@@ -95,7 +95,7 @@ public class BJStrategyTest
                                     try
                                     {
                                         BlackjackHand h = BlackjackHand.createHand(BlackjackHand.BlackjackHandValue.valueOf(commandArgs.get(0))) ;
-                                        Card dealerCard = BlackjackStrategy.getCardForConfigValue(Integer.parseInt(commandArgs.get(1))) ;
+                                        Card dealerCard = BlackjackStrategyStatic.getCardForConfigValue(Integer.parseInt(commandArgs.get(1))) ;
                                         Blackjack.Move m = s.getHandDecision( rules, h, dealerCard ) ;
                                         System.out.println("getHandDecision( hand = " + h + ", dealer upcard = " + dealerCard + " ) = " + m) ;
                                     }
