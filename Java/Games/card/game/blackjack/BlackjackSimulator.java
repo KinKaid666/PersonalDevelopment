@@ -7,8 +7,7 @@ import java.util.logging.Logger ;
 import card.game.blackjack.* ;
 import card.Card ;
 
-public class BlackjackSimulator
-{
+public class BlackjackSimulator {
     private static Logger logger = Logger.getLogger(BlackjackSimulator.class.getName()) ;
 
     private BlackjackStrategy strategy_ ;
@@ -16,8 +15,7 @@ public class BlackjackSimulator
     private Blackjack         game_ ;
     private int               numHands_ ;
 
-    public BlackjackSimulator(BlackjackStrategy s, int numHands)
-    {
+    public BlackjackSimulator(BlackjackStrategy s, int numHands) {
         strategy_ = s ;
         numHands_ = numHands ;
         player_ = new BlackjackPlayer("",strategy_) ;
@@ -39,21 +37,14 @@ public class BlackjackSimulator
         game_ = new Blackjack(rules, players) ;
     }
 
-    // TODO: Needs to be hands vs. games
-    public void simulate()
-    {
-        while( numHands_ > 0 )
-        {
-            try
-            {
+    public void simulate() {
+        while( numHands_ > 0 ) {
+            try {
                 game_.play() ;
-                if( game_.reshuffleNeeded() )
-                {
+                if( game_.reshuffleNeeded() ) {
                     game_.shuffle() ;
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println(e.getMessage()) ;
                 System.exit(1) ;
             }
@@ -64,8 +55,7 @@ public class BlackjackSimulator
 
     //
     // Return how well the overall simulation did from 0 to infinity
-    public double getFitness()
-    {
+    public double getFitness() {
         return strategy_.getFitness() ;
     }
 }

@@ -5,17 +5,12 @@ public class Die
 {
     private static int diceMin_ = 0 ;
     private static int diceMax_ = 6 ;
-    private int  diceValue_ ;
+    private int diceValue_ ;
     private static Random random_ ;
-    private static boolean randomInitialized_ = false ;
 
-    public Die()
-    {
-        if(!randomInitialized_)
-        {
+    public Die() {
+        if(random_ == null)
             random_ = new Random(System.currentTimeMillis()) ;
-            randomInitialized_ = true ;
-        }
         diceValue_ = 0 ;
     }
 
@@ -33,5 +28,12 @@ public class Die
     public int value()
     {
         return diceValue_ ;
+    }
+
+    public Die clone() {
+        Die clonedDie = new Die() ;
+        clonedDie.diceValue_ = this.diceValue_ ;
+        clonedDie.random_ = this.random_ ;
+        return clonedDie ;
     }
 } ;

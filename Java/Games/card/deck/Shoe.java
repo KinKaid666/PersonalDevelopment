@@ -5,43 +5,42 @@ import java.util.LinkedList ;
 import java.util.List ;
 import card.Card ;
 
-public class Shoe extends Deck
-{
+public class Shoe extends Deck {
 
-    private int numberOfDecks_ ;
-    private int numberOfCards_ ;
-    private double reshuffleAt_ ;
-    private static double RESHUFFLE_AT_DEFAULT = 0.1 ;
+    private Integer numberOfDecks_ ;
+    private Integer numberOfCards_ ;
+    private Double reshuffleAt_ ;
+    protected static Double RESHUFFLE_AT_DEFAULT = 0.1 ;
 
     /*
     ** Construct a new deck
     */
-    public Shoe(int decks)
-    {
+    public Shoe(Integer decks) {
         this(decks,RESHUFFLE_AT_DEFAULT) ;
     }
 
     /*
     ** Construct a new deck
     */
-    public Shoe(int decks, double reshuffleAt)
-    {
+    public Shoe(Integer decks, Double reshuffleAt) {
         numberOfDecks_ = decks ;
         numberOfCards_ = create() ;
         reshuffleAt_   = reshuffleAt ;
     }
 
-    public int create()
-    {
-        for( int i = 0 ; i < numberOfDecks_ ; ++i )
-        {
+    public Integer getNumberOfDecks() { return numberOfDecks_ ; }
+
+    public Integer create() {
+        for( int i = 0 ; i < numberOfDecks_ ; ++i ) {
             addAll((new PokerDeck()).getCards()) ;
         }
+        // each poker deck will be shuffled upon creation
+        // but we want the shoe shuffled too
+        shuffle() ;
         return getCards().size() ;
     }
 
-    public void reshuffle()
-    {
+    public void reshuffle() {
         numberOfCards_ = create() ;
         shuffle() ;
     }
@@ -49,11 +48,9 @@ public class Shoe extends Deck
     /*
      * When is a reshuffle needed
      */
-    public boolean reshuffleNeeded()
-    {
+    public boolean reshuffleNeeded() {
         // If the deck is empty or we're below the reshuffleAt %
-        if(isEmpty() || ((getCards().size()*1.0/numberOfCards_) < reshuffleAt_))
-        {
+        if(isEmpty() || ((getCards().size()*1.0/numberOfCards_) < reshuffleAt_)) {
             return true ;
         }
         return false ;

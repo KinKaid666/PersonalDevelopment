@@ -5,60 +5,59 @@ import java.util.LinkedList ;
 import java.util.List ;
 import card.Card ;
 
-public abstract class Deck
-{
+public abstract class Deck {
 
     private List<Card> deck_ = new LinkedList<Card>() ;
 
     /*
     ** Construct a new deck
     */
-    public Deck()
-    {
-        shuffle() ;
+    public Deck() {
+        deck_ = new LinkedList<Card>() ;
     }
 
     /*
     ** Should this be called poll?
     */
-    public Card getNextCard()
-    {
+    public Card getNextCard() {
+        if(isEmpty()) {
+            return null ;
+        }
         return deck_.remove(deck_.size() - 1) ;
     }
 
     /*
     ** Grab all the cards, helpful for multi-deck shoes
     */
-    public List<Card> getCards()
-    {
+    public List<Card> getCards() {
         return deck_ ;
     }
 
     /*
     ** Add one card
     */
-    public boolean add(Card card)
-    {
+    public boolean add(Card card) {
         return deck_.add(card) ;
     }
 
     /*
     ** Add a list of cards
     */
-    public boolean addAll(List<Card> cards)
-    {
+    public boolean addAll(List<Card> cards) {
         return deck_.addAll(cards) ;
     }
 
     public abstract boolean reshuffleNeeded() ;
 
-    public Boolean isEmpty()
-    {
+    public Boolean isEmpty() {
         return deck_.isEmpty() ;
     }
 
-    public void shuffle()
-    {
+    public int getNumberOfCardsLeft() {
+        return deck_.size() ;
+    }
+
+    public void shuffle() {
         Collections.shuffle(deck_) ;
     }
 }

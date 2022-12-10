@@ -2,8 +2,7 @@ package card.game.blackjack ;
 
 import java.util.logging.Logger ;
 
-public class BlackjackRules
-{
+public class BlackjackRules {
     private static Logger logger = Logger.getLogger(BlackjackRules.class.getName()) ;
 
     private int     numberOfDecks_       ;
@@ -26,8 +25,7 @@ public class BlackjackRules
                            boolean resplitAces        ,
                            boolean doubleAfterSplit   ,
                            boolean doubleOn10Or11Only ,
-                           boolean insurance          )
-    {
+                           boolean insurance          ) {
         numberOfDecks_       = numberOfDecks       ;
         splitAces_           = splitAces           ;
         hitOnSoft17_         = hitOnSoft17         ;
@@ -50,4 +48,21 @@ public class BlackjackRules
     public boolean getCanDoubleAfterSplit (){ return doubleAfterSplit_    ; }
     public boolean getOnly10or11Double()    { return doubleOn10Or11Only_  ; }
     public boolean getOfferInsurance()      { return insurance_           ; }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder() ;
+        sb.append("BlackjackRules={") ;
+        sb.append("numberOfDecks=").append(numberOfDecks_) ;
+        sb.append(", splitAces=").append(splitAces_) ;
+        sb.append(", hitOnSoft17=").append(hitOnSoft17_) ;
+        sb.append(", allowEarlySurrender=").append(allowEarlySurrender_) ;
+        sb.append(", allowLateSurrender=").append(allowLateSurrender_) ;
+        sb.append(", resplitToNN=").append(resplitToNN_) ;
+        sb.append(", resplitAces=").append(resplitAces_) ;
+        sb.append(", doubleAfterSplit=").append(doubleAfterSplit_) ;
+        sb.append(", doubleOn10Or11Only=").append(doubleOn10Or11Only_) ;
+        sb.append(", insurance=").append(insurance_) ;
+        sb.append("}") ;
+        return sb.toString() ;
+    }
 }

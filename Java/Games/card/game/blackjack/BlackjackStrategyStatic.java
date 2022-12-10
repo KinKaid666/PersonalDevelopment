@@ -51,33 +51,26 @@ public class BlackjackStrategyStatic extends BlackjackStrategy
                     HashMap<Integer, HashMap<Card, BlackjackStrategy.StrategicMove>> softTotalStrategies,
                     HashMap<Integer, HashMap<Card, BlackjackStrategy.StrategicMove>> hardTotalStrategies,
                     HashMap<Integer, HashMap<Card, BlackjackStrategy.StrategicMove>> surrenderStrategies,
-                    boolean                                takeInsurance      ,
-                    boolean                                takeEvenMoney      )
-    {
+                    boolean                                takeInsurance,
+                    boolean                                takeEvenMoney) {
         super(pairStrategies,softTotalStrategies,hardTotalStrategies,surrenderStrategies,takeInsurance,takeEvenMoney) ;
     }
 
-    public static BlackjackStrategy createStrategyFromFile(String filename) throws Exception
-    {
+    public static BlackjackStrategy createStrategyFromFile(String filename) throws Exception {
         BlackjackStrategy s = null ;
 
         // first try to find if we've already got this strategy object built
-        if(strategies_.containsKey(filename))
-        {
+        if(strategies_.containsKey(filename)) {
             s = strategies_.get(filename) ;
-        }
-        else
-        {
+        } else {
             File sFile = new File(filename) ;
             BufferedReader br = new BufferedReader(new FileReader(sFile)) ;
 
             String fileContents = new String() ;
             String fileLine ;
-            while((fileLine = br.readLine()) != null)
-            {
+            while((fileLine = br.readLine()) != null) {
                 fileLine = fileLine.replaceAll("\\s", "");
-                if(fileLine.indexOf('#') >= 0)
-                {
+                if(fileLine.indexOf('#') >= 0) {
                     fileLine = fileLine.substring(0,fileLine.indexOf('#')) ;
                 }
                 fileContents += fileLine ;
@@ -85,22 +78,14 @@ public class BlackjackStrategyStatic extends BlackjackStrategy
 
             String[] pieces = fileContents.split("}") ;
             String pairs = null, soft = null, hard = null, sur  = null;
-            for(int i = 0 ; i < pieces.length ; ++i )
-            {
-                if(pieces[i].contains(PAIRS_STRING))
-                {
+            for(int i = 0 ; i < pieces.length ; ++i ) {
+                if(pieces[i].contains(PAIRS_STRING)) {
                     pairs = pieces[i].substring(pieces[i].indexOf("{")+1) ;
-                }
-                else if(pieces[i].contains(SOFT_TOTAL_STRING))
-                {
+                } else if(pieces[i].contains(SOFT_TOTAL_STRING)) {
                     soft = pieces[i].substring(pieces[i].indexOf("{")+1) ;
-                }
-                else if(pieces[i].contains(HARD_TOTAL_STRING))
-                {
+                } else if(pieces[i].contains(HARD_TOTAL_STRING)) {
                     hard = pieces[i].substring(pieces[i].indexOf("{")+1) ;
-                }
-                else if(pieces[i].contains(SURRENDER_STRING))
-                {
+                } else if(pieces[i].contains(SURRENDER_STRING)) {
                     sur = pieces[i].substring(pieces[i].indexOf("{")+1) ;
                 }
             }
@@ -108,36 +93,24 @@ public class BlackjackStrategyStatic extends BlackjackStrategy
             HashMap<Integer,HashMap<Card,BlackjackStrategy.StrategicMove>> softTotalStrategies = null ;
             HashMap<Integer,HashMap<Card,BlackjackStrategy.StrategicMove>> hardTotalStrategies = null ;
             HashMap<Integer,HashMap<Card,BlackjackStrategy.StrategicMove>> surrenderStrategies = null ;
-            if( pairs != null )
-            {
+            if( pairs != null ) {
                 pairsStrategies = processMoveConfiguration(pairs) ;
-            }
-            else
-            {
+            } else {
                 throw new Exception("Invalid config: missing pairs configuation") ;
             }
-            if( soft != null )
-            {
+            if( soft != null ) {
                 softTotalStrategies = processMoveConfiguration(soft) ;
-            }
-            else
-            {
+            } else {
                 throw new Exception("Invalid config: missing soft totals configuration") ;
             }
-            if( hard != null )
-            {
+            if( hard != null ) {
                 hardTotalStrategies = processMoveConfiguration(hard) ;
-            }
-            else
-            {
+            } else {
                 throw new Exception("Invalid config: missing hard totals configuration") ;
             }
-            if( sur != null )
-            {
+            if( sur != null ) {
                 surrenderStrategies = processMoveConfiguration(sur) ;
-            }
-            else
-            {
+            } else {
                 throw new Exception("Invalid config: missing surrender configuration") ;
             }
             s = new BlackjackStrategyStatic(pairsStrategies,
@@ -154,37 +127,29 @@ public class BlackjackStrategyStatic extends BlackjackStrategy
     /*
      * Helper function
      */
-    private static HashMap<Integer, HashMap<Card, BlackjackStrategy.StrategicMove>> processMoveConfiguration(String s) throws Exception
-    {
+    private static HashMap<Integer, HashMap<Card, BlackjackStrategy.StrategicMove>> processMoveConfiguration(String s) throws Exception {
         HashMap<Integer, HashMap<Card, BlackjackStrategy.StrategicMove>> ret = new HashMap<Integer, HashMap<Card, BlackjackStrategy.StrategicMove>>() ;
 
         String[] lines = s.split(";") ;
-        for( int i = 0 ; i < lines.length ; ++i )
-        {
+        for( int i = 0 ; i < lines.length ; ++i ) {
             String[] components = lines[i].split(":") ;
 
-            if(components.length != 2)
-            {
+            if(components.length != 2) {
                 throw new Exception("Invalid config line: " + lines[i] + " expecting PlayerCard:Option,Option,...;") ;
             }
 
             Integer playerHandValue = Integer.parseInt(components[0]);
             String [] dealerUpcardOptions = components[1].split(",") ;
-            if(dealerUpcardOptions.length != 10)
-            {
+            if(dealerUpcardOptions.length != 10) {
                 throw new Exception("Invalid config line: " + lines[i] + " expecting 10 dealer options") ;
             }
 
-            for( int j = 0 ; j < dealerUpcardOptions.length ; ++j )
-            {
+            for( int j = 0 ; j < dealerUpcardOptions.length ; ++j ) {
 
                 // Insert it into the array, deaer upcard
-                if(ret.containsKey(playerHandValue))
-                {
+                if(ret.containsKey(playerHandValue)) {
                     ret.get(playerHandValue).put(getCardForConfigValue(j+2),getStrategicMoveForConfigValue(dealerUpcardOptions[j].charAt(0))) ;
-                }
-                else
-                {
+                } else {
                     HashMap<Card, BlackjackStrategy.StrategicMove> m = new HashMap<Card,BlackjackStrategy.StrategicMove>() ;
                     m.put(getCardForConfigValue(j+2),getStrategicMoveForConfigValue(dealerUpcardOptions[j].charAt(0))) ;
                     ret.put(playerHandValue,m) ;
@@ -194,12 +159,10 @@ public class BlackjackStrategyStatic extends BlackjackStrategy
         return ret ;
     }
 
-    public static Card getCardForConfigValue(Integer i) throws Exception
-    {
+    public static Card getCardForConfigValue(Integer i) throws Exception {
         Card c = null ;
 
-        switch(i.intValue())
-        {
+        switch(i.intValue()) {
             case 2:
                 c = Card.valueOf(Card.Rank.Deuce,Card.Suit.Spades) ;
                 break ;
@@ -236,10 +199,8 @@ public class BlackjackStrategyStatic extends BlackjackStrategy
         return c ;
     }
 
-    public static char getConfigValueForStrategicMove(BlackjackStrategy.StrategicMove m) throws Exception
-    {
-        switch(m)
-        {
+    public static char getConfigValueForStrategicMove(BlackjackStrategy.StrategicMove m) throws Exception {
+        switch(m) {
             case Split:
                 return 'Y' ;
             case DontSplit:
@@ -262,10 +223,8 @@ public class BlackjackStrategyStatic extends BlackjackStrategy
         // useless
         throw new Exception("Unknown") ;
     }
-    public static BlackjackStrategy.StrategicMove getStrategicMoveForConfigValue(char c) throws Exception
-    {
-        switch(c)
-        {
+    public static BlackjackStrategy.StrategicMove getStrategicMoveForConfigValue(char c) throws Exception {
+        switch(c) {
             case 'Y':
                 return BlackjackStrategy.StrategicMove.Split ;
             case 'N':
