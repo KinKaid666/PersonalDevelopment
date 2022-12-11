@@ -1,22 +1,14 @@
 #!/usr/bin/python3
 
+from dataclasses import dataclass
 import unittest
-
 # Simple class to hold a point
 # Supports:
 #    print(), dictionary, ==
+@dataclass(frozen=True,order=True)
 class Point:
-    def __init__(self,x,y):
-        self.x = x
-        self.y = y
-    def __repr__(self):
-        return "<Point (%s,%s)>" % (self.x, self.y)
-    def __str_(self): return "<Point (%s,%s)>" % (self.x, self.y)
-    def __hash__(self):
-        return hash((self.x, self.y))
-    def __eq__(self, other):
-        return (self.x, self.y) == (other.x, other.y)
-    # given an array of points,  returns a histogram
+    x: int
+    y: int
     def makeFrequency(points):
         x = {}
         for i in points:

@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-unsigned long long fib( unsigned long long x )
-{
-    switch(x)
-    {
+unsigned long long fib(unsigned long long x) {
+    switch(x) {
     case 0:
         return 0 ;
     case 1:
@@ -16,10 +14,8 @@ unsigned long long fib( unsigned long long x )
     }
 }
 
-int main( int ac, char **av )
-{
-    if( ac != 2 )
-    {
+int main( int ac, char **av ) {
+    if( ac != 2 ) {
         fprintf(stderr, "usage: %s <number>\n", av[0]) ;
         exit(EXIT_FAILURE) ;
     }

@@ -4,6 +4,7 @@ int CELL_SIZE = 10 ;
 
 int ROWS = 100 ;
 int COLS = 100 ;
+double alivePct = .5 ;
 LifeGame life ;
 int generation = 0 ;
 
@@ -12,7 +13,7 @@ void setup() {
   frameRate(5);
   //stroke(1) ;
   noStroke() ;
-  life = new LifeGame(ROWS, COLS) ;
+  life = new LifeGame(ROWS, COLS, alivePct) ;
 }
 
 void draw() {

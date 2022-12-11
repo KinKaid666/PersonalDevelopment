@@ -1,10 +1,12 @@
 #include <GLUT/glut.h>         /* glut.h includes gl.h and glu.h*/
 #include <time.h>
-       
+#include <stdio.h>
+#include <stdlib.h>
+
 #define S_ITERATIONS    1000000
 #define SCREENHEIGHT    500
 #define SCREENWIDTH     500
-       
+
 #define drawDot( x, y ) glBegin( GL_POINTS ) ;  \
                             glVertex2i( x, y ) ;\
                         glEnd() ;
@@ -13,8 +15,8 @@ typedef struct glintPoint
 {
     GLint x,y ;
 } GLintPoint ;
-    
-void Sierpinski() 
+
+void Sierpinski()
 {
     GLintPoint T[3] = {{10,10},{300,30},{200, 300}};
     int i ;

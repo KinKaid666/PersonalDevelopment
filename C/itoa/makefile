@@ -1,6 +1,6 @@
 TARGET=		itoa
 CC=		gcc
-CCFLAGS=	-g -ansi
+CCFLAGS=	
 LINK=		gcc
 LINKFLAGS=	
 RM=		rm
