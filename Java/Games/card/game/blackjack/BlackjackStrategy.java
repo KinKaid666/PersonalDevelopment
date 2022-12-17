@@ -189,18 +189,29 @@ public class BlackjackStrategy {
         o.printf("}\n" ) ; 
     }
 
+    //
+    // Print the straegy
     public static void printStrategyHelper(HashMap<Integer, HashMap<Card, StrategicMove>> m, PrintStream o) {
-        ArrayList<Integer> keys = new ArrayList<Integer>(m.keySet()) ;
-        Collections.sort(keys) ;
+        ArrayList<Integer> playerHands = new ArrayList<Integer>(m.keySet()) ;
+        Collections.sort(playerHands) ;
+
+        // For player hand of '1', make it after 10
+        if (playerHands.get(0).equals(1)) {
+            playerHands.remove(0) ;
+            playerHands.add(1) ;
+        }
+
         //
-        // Print header row
+        // Print header row | VERY WELL DEFINED ORDER
         o.printf("      # 2,3,4,5,6,7,8,9,T,A\n") ;
-        for(Integer key : keys) {
+        for(Integer playerHand : playerHands) {
             int x = 0 ;
-            o.printf("%7d:", key) ;
-            for( Card c : m.get(key).keySet() ) {
+            o.printf("%7d:", playerHand) ;
+            List<Card> dealerUpcards = new ArrayList<>(m.get(playerHand).keySet()) ;
+            Collections.sort(dealerUpcards) ;
+            for( Card dealerUpcard : dealerUpcards ) {
                 try {
-                    o.printf("%s%s",(x != 0 ? ",":""), BlackjackStrategyStatic.getConfigValueForStrategicMove(m.get(key).get(c))) ;
+                    o.printf("%s%s",(x != 0 ? ",":""), BlackjackStrategyStatic.getConfigValueForStrategicMove(m.get(playerHand).get(dealerUpcard))) ;
                 } catch(Exception e) {
                     System.err.println("Catch exception: " + e.getMessage()) ;
                 }

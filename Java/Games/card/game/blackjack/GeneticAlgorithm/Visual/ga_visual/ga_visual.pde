@@ -8,6 +8,9 @@ import java.io.* ;
 import java.text.DecimalFormat ;
 import java.math.RoundingMode ;
 
+// https://github.com/jagracar/grafica
+import grafica.*;
+
 BlackjackStrategy bookStrategy ;
 BlackjackStrategy bestStrategy ;
 BlackjackRules    rules ;
@@ -16,13 +19,13 @@ List<Double> strategiesFitnessValues ;
 String bookStrategyFilename = String.valueOf("/Users/ericferguson/Development/Java/Games/card/game/blackjack/Strategies/perfect.stg") ;
 Random r = new Random(System.currentTimeMillis()) ;
 int numStrategies   = 1_000 ;
-int numHands        = 10_000 ;
+int numHands        = 100_000 ;
 int currentGenerationProgress = 0 ;
-double mutationRate = 0.001 ;
+double mutationRate = 0.015d ;
 
 // Continuation
-String bestStrategyFilename = "/Users/ericferguson/Development/Java/Games/card/game/blackjack/GeneticAlgorithm/Visual/ga_visual/data/strategy-1000s-10000h-0.001m-535i.stg" ;
-int generation = 535 ;
+String bestStrategyFilename = "/Users/ericferguson/Development/Java/Games/card/game/blackjack/GeneticAlgorithm/Visual/ga_visual/data/strategy-1000s-10000h-0.015m-1377i.stg" ;
+int generation = 1 ;
 
 int textSize = 11 ;
 int cellSize = 13 ;
@@ -39,8 +42,8 @@ boolean simulating = false ;
 void setup() {
   try {
     bookStrategy = BlackjackStrategyStatic.createStrategyFromFile(bookStrategyFilename) ;
-    //bestStrategy = BlackjackStrategy.createRandom() ;
-    bestStrategy = BlackjackStrategyStatic.createStrategyFromFile(bestStrategyFilename) ;
+    bestStrategy = BlackjackStrategy.createRandom() ;
+    //bestStrategy = BlackjackStrategyStatic.createStrategyFromFile(bestStrategyFilename) ;
     rules = new BlackjackRules(6, // Decks
       true, // split Aces
       true, // dealer hit soft 17
@@ -63,9 +66,20 @@ void setup() {
     System.err.println("caught exception: " + e.getMessage()) ;
     System.exit(1) ;
   }
-  size(550, 873) ;
+  size(1000 /*550*/, 873) ;
+
+  buttonColor = color(255) ;
+  highlightColor = color(204) ;
+  startButtonX = cellSize * 27 ;
+  startButtonY = 200 ;
+  stopButtonX = startButtonX + buttonWidth + cellSize ;
+  stopButtonY = 200 ;
+}
+
+void draw() {
+  background(200) ;
   displayStrategy("Book", bookStrategy, cellSize, cellSize/2) ;
-  displayStrategy("Random", bestStrategy, (cellSize * 14), cellSize/2) ;
+  //displayStrategy("Random", bestStrategy, (cellSize * 14), cellSize/2) ;
 
   textSize(textSize) ;
   fill(0, 0, 0) ;
@@ -73,12 +87,6 @@ void setup() {
   int keyX = cellSize * 27 ;
   int keyY = cellSize ;
 
-  text("Population = " + numStrategies, keyX, keyY) ;
-  keyY += cellSize;
-  text("Hands / sim = " + numHands, keyX, keyY) ;
-  keyY += cellSize;
-  text(String.format("Mutation rate = %.3f", mutationRate), keyX, keyY) ;
-  keyY += cellSize;
   text("H – Hit", keyX, keyY) ;
   keyY += textSize ;
   text("P – Split", keyX, keyY) ;
@@ -90,17 +98,14 @@ void setup() {
   text("R – Surrender (if you can).", keyX, keyY) ;
   keyY += textSize ;
   text("X – No Surrender.", keyX, keyY) ;
-  keyY += textSize ;
-  
-  buttonColor = color(255) ;
-  highlightColor = color(204) ;
-  startButtonX = cellSize * 27 ;
-  startButtonY = 200 ;
-  stopButtonX = startButtonX + buttonWidth + cellSize ;
-  stopButtonY = 200 ;
-}
+  keyY += textSize * 3 ;
+  text(String.format("Population = %,d", numStrategies), keyX, keyY) ;
+  keyY += cellSize;
+  text(String.format("Hands / sim = %,d", numHands), keyX, keyY) ;
+  keyY += cellSize;
+  text(String.format("Mutation rate = %.1f%%", mutationRate*100.0f), keyX, keyY) ;
+  keyY += cellSize;
 
-void draw() {
   updateButtons() ;
 
   if (overStartButton) {
@@ -144,11 +149,35 @@ void draw() {
   // Given the way processing works, the
   try {
     List<Double> values = List.copyOf(strategiesFitnessValues) ;
-    drawGraph(List.copyOf(strategiesFitnessValues),
+    // Home grown graph
+    //drawGraph(values,
+    //  startButtonX,
+    //  startButtonY + buttonHeight*2,
+    //  buttonWidth*2 + cellSize,
+    //  buttonWidth*2 + cellSize) ;
+    
+    // Graphica
+    GPlot plot = new GPlot(this,    
       startButtonX,
       startButtonY + buttonHeight*2,
-      buttonWidth*2 + cellSize,
-      buttonWidth*2 + cellSize) ;
+      buttonWidth*6,
+      buttonWidth*6) ;
+    GPointsArray points = new GPointsArray(values.size());
+    for (int i = 0; i < values.size(); i++) {
+      points.add(new GPoint((float)i, values.get(i).floatValue())) ;
+    }
+    //plot.setPos(startButtonX, startButtonY + buttonHeight*2) ;
+    plot.setPoints(points) ;
+    plot.getXAxis().setAxisLabelText("Generations");
+    plot.getYAxis().setAxisLabelText("Fitness");
+    plot.setTitleText("Fitness Function");
+    // Activate panning
+    plot.activatePanning();
+
+    // Preserve initial XLim and YLim for autoscale
+    //xLimAutoscale = plot.getXLim();
+    //yLimAutoscale = plot.getYLim();
+    plot.defaultDraw();
   }
   catch (Exception e) {
     System.err.println("Caught exception while copying list: " + e.getMessage()) ;
@@ -189,7 +218,6 @@ void drawGraph(List<Double> values, int x, int y, int width, int height) {
 
   // x will go from 0 -> min(5, # values)
   // y will go from 0 -> max(values)
-  // create some simple hashing that's logical to humans
   int currentX = 0 ;
   float prevX = -1, prevY = -1 ;
   double maxY = values.stream()
@@ -562,19 +590,26 @@ void keyPressed() {
     try {
       // Creates a FileOutputStream
       FileOutputStream file = new FileOutputStream(dataPath("") + "/strategy-" + saveInfo + ".stg");
-
-      // Creates a PrintStream
       PrintStream output = new PrintStream(file, true);
-
-      // Save strategy file
       bestStrategy.printStrategy(output) ;
 
       // Save image
       save(dataPath("") + "/image-" + saveInfo + ".jpg");
+      System.out.println("Strategy saved!") ;
     }
     catch(Exception e) {
       System.out.println("Failed to save: " + e.getMessage()) ;
+      return ;
     }
-    System.out.println("Strategy saved!") ;
+  }
+
+  if (key == 'K' || key == 'k') {
+    mutationRate += 0.001d ;
+  }
+  if (key == 'J' || key == 'j') {
+    mutationRate -= 0.001d ;
+    if (mutationRate < 0.0d) {
+      mutationRate = 0 ;
+    }
   }
 }

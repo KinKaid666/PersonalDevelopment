@@ -22,7 +22,7 @@ class PlayBlackjack {
                 s = BlackjackStrategy.createRandom() ;
             } else {
                 s = BlackjackStrategyStatic.createStrategyFromFile(args[1]) ;
-                s.printStrategy(System.out) ;
+                //s.printStrategy(System.out) ;
             }
         } catch (Exception e) {
             System.err.println("caught exception: " + e.getMessage()) ;
@@ -31,7 +31,9 @@ class PlayBlackjack {
 
         BlackjackSimulator sim = new BlackjackSimulator(s,hands) ;
         sim.simulate() ;
-        // s.printStatisticsCSV(System.out) ;
-        s.printHandHistogramCSV(System.out) ;
+        s.printStatisticsCSV(System.out) ;
+        //s.printHandHistogramCSV(System.out) ;
+        double fitness = s.getFitness() ;
+        System.out.printf("getFitness() = %.2f\n", fitness) ;
     }
 }
