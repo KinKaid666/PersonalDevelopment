@@ -1,5 +1,5 @@
-.class
-.o
+*.class
+*.o
 *.jar
 .DS_Store
 External
